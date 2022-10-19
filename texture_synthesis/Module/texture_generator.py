@@ -125,14 +125,15 @@ class TextureGenerator(object):
 
         file_path_pair_list = []
         for root, _, files in os.walk(image_folder_path):
+            current_save_texture_file_root_path = \
+                root.replace(image_folder_path, save_texture_folder_path) + "/"
             for file_name in files:
                 file_format = "." + file_name.split(".")[-1]
                 if file_format not in [".jpg", ".jpeg", ".png"]:
                     continue
 
                 image_file_path = root + "/" + file_name
-                save_texture_file_path = \
-                    root.replace(image_folder_path, save_texture_folder_path) + "/" + \
+                save_texture_file_path = current_save_texture_file_root_path + \
                     file_name[:-len(file_format)] + ".png"
                 file_path_pair_list.append(
                     [image_file_path, save_texture_file_path])
