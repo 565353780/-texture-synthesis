@@ -62,27 +62,37 @@ class TextureGenerator(object):
             result[y:y + block_size[1], x:x + block_size[0]] = patch
 
         generated_texture = (result * 255).astype(np.uint8)
-        return generated_texture
+        return generated_texture, image.shape[:2], overlap
 
     def generateWidthRepeatTexture(self, image, print_progress=False):
-        texture = self.generateTexture(image, [1.0, 1.0], [3, 1],
-                                       print_progress)
-        width_split = int(texture.shape[1] / 3.0)
-        return texture[:, width_split:2 * width_split]
+        texture, image_shape, overlap = self.generateTexture(
+            image, [1.0, 1.0], [3, 1], print_progress)
+
+        width_start = int(image_shape[1] - 0.5 * overlap[0])
+        width_end = int(2 * image_shape[1] - 1.5 * overlap[0])
+
+        return texture[:, width_start:width_end]
 
     def generateHeightRepeatTexture(self, image, print_progress=False):
-        texture = self.generateTexture(image, [1.0, 1.0], [1, 3],
-                                       print_progress)
-        height_split = int(texture.shape[0] / 3.0)
-        return texture[height_split:2 * height_split, :]
+        texture, image_shape, overlap = self.generateTexture(
+            image, [1.0, 1.0], [1, 3], print_progress)
+
+        height_start = int(image_shape[0] - 0.5 * overlap[1])
+        height_end = int(2 * image_shape[0] - 1.5 * overlap[1])
+
+        return texture[height_start:height_end, :]
 
     def generateWidthAndHeightRepeatTexture(self, image, print_progress=False):
-        texture = self.generateTexture(image, [1.0, 1.0], [3, 3],
-                                       print_progress)
-        width_split = int(texture.shape[1] / 3.0)
-        height_split = int(texture.shape[0] / 3.0)
-        return texture[height_split:2 * height_split,
-                       width_split:2 * width_split]
+        texture, image_shape, overlap = self.generateTexture(
+            image, [1.0, 1.0], [3, 3], print_progress)
+
+        width_start = int(image_shape[1] - 0.5 * overlap[0])
+        width_end = int(2 * image_shape[1] - 1.5 * overlap[0])
+
+        height_start = int(image_shape[0] - 0.5 * overlap[1])
+        height_end = int(2 * image_shape[0] - 1.5 * overlap[1])
+
+        return texture[height_start:height_end, width_start:width_end]
 
     def generateRepeatTexture(self,
                               image,
