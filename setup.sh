@@ -1,2 +1,2 @@
-pip install numpy scikit-image pillow tqdm
+pip install numpy opencv-python tqdm
 
