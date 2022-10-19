@@ -4,6 +4,7 @@
 import os
 import heapq
 import numpy as np
+from tqdm import tqdm
 from PIL import Image
 from skimage import util
 
@@ -100,7 +101,9 @@ class TextureGenerator(object):
     def __init__(self):
         return
 
-    def generateTexture(self, image_path, block_size, num_block, mode):
+    def generateTexture(self, image_path, block_size, num_block, mode, print_progress=False):
+        assert os.path.exists(image_path)
+
         texture = Image.open(image_path)
         texture = util.img_as_float(texture)
 
@@ -112,7 +115,12 @@ class TextureGenerator(object):
 
         res = np.zeros((h, w, texture.shape[2]))
 
-        for i in range(num_blockHigh):
+        for_data = range(num_blockHigh)
+        if print_progress:
+            print("[INFO][TextureGenerator::generateTexture]")
+            print("\t start generate texture...")
+            for_data = tqdm(for_data)
+        for i in for_data:
             for j in range(num_blockWide):
                 y = i * (block_size - overlap)
                 x = j * (block_size - overlap)
