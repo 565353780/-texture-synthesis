@@ -14,14 +14,14 @@ class TextureGenerator(object):
 
     def generateTexture(self,
                         image,
-                        patch_sample_percent,
+                        patch_sample_percent_list,
                         block_num_list,
                         print_progress=False):
         texture = image / 255.0
 
         block_size = [
-            int(texture.shape[i] * patch_sample_percent)
-            for i in range(1, -1, -1)
+            int(texture.shape[1 - i] * patch_sample_percent_list[i])
+            for i in range(2)
         ]
 
         overlap = [block_size[i] // 6 for i in range(2)]
@@ -62,17 +62,17 @@ class TextureGenerator(object):
         return generated_texture
 
     def generateWidthRepeatTexture(self, image, print_progress=False):
-        texture = self.generateTexture(image, 1.0, (3, 1), print_progress)
+        texture = self.generateTexture(image, [1.0, 1.0], [3, 1], print_progress)
         width_split = int(texture.shape[1] / 3.0)
         return texture[:, width_split:2 * width_split]
 
     def generateHeightRepeatTexture(self, image, print_progress=False):
-        texture = self.generateTexture(image, 1.0, (1, 3), print_progress)
+        texture = self.generateTexture(image, [1.0, 1.0], [1, 3], print_progress)
         height_split = int(texture.shape[0] / 3.0)
         return texture[height_split:2 * height_split, :]
 
     def generateWidthAndHeightRepeatTexture(self, image, print_progress=False):
-        texture = self.generateTexture(image, 1.0, (3, 3), print_progress)
+        texture = self.generateTexture(image, [1.0, 1.0], [3, 3], print_progress)
         width_split = int(texture.shape[1] / 3.0)
         height_split = int(texture.shape[0] / 3.0)
         return texture[height_split:2 * height_split,
