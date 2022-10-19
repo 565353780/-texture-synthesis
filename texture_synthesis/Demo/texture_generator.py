@@ -9,8 +9,11 @@ def demo():
     block_size = 60
     num_block = 8
     mode = 'Best'  # Best or Cut
+    print_progress = True
 
     texture_generator = TextureGenerator()
-    image = texture_generator.generateTexture(image_path, block_size, (num_block, num_block), mode)
+    image = texture_generator.generateTexture(image_path, block_size,
+                                              (num_block, num_block), mode,
+                                              print_progress)
     image.show()
     return True
