@@ -24,16 +24,19 @@ class TextureGenerator(object):
         texture = cv2.imread(image_path)
         texture = texture / 255.0
 
-        texture_shape = texture.shape[:2]
+        block_size = [
+            int(texture.shape[i] * patch_sample_percent)
+            for i in range(1, -1, -1)
+        ]
 
-        block_size = int(np.min(texture_shape) * patch_sample_percent)
-
-        overlap = block_size // 6
+        overlap = [block_size[i] // 6 for i in range(2)]
 
         block_width_num, block_height_num = num_block
 
-        w = (block_width_num * block_size) - (block_width_num - 1) * overlap
-        h = (block_height_num * block_size) - (block_height_num - 1) * overlap
+        w = (block_width_num *
+             block_size[0]) - (block_width_num - 1) * overlap[0]
+        h = (block_height_num *
+             block_size[1]) - (block_height_num - 1) * overlap[1]
 
         result = np.zeros((h, w, texture.shape[2]))
 
@@ -48,8 +51,8 @@ class TextureGenerator(object):
             width_idx = block_idx // block_height_num
             height_idx = block_idx % block_height_num
 
-            x = width_idx * (block_size - overlap)
-            y = height_idx * (block_size - overlap)
+            x = width_idx * (block_size[0] - overlap[0])
+            y = height_idx * (block_size[1] - overlap[1])
 
             if width_idx == 0 and height_idx == 0:
                 patch = getRandomPatch(texture, block_size)
@@ -58,7 +61,7 @@ class TextureGenerator(object):
                                            result, y, x)
                 patch = getMinCutPatch(patch, overlap, result, y, x)
 
-            result[y:y + block_size, x:x + block_size] = patch
+            result[y:y + block_size[1], x:x + block_size[0]] = patch
 
         image = (result * 255).astype(np.uint8)
         return image
