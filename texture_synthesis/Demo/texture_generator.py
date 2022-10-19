@@ -8,7 +8,6 @@ from texture_synthesis.Module.texture_generator import TextureGenerator
 
 
 def demo():
-    image_file_path = "./data/input1.jpg"
     image_file_path = "/home/chli/chLi/texture/flower.png"
     patch_sample_percent_list = [0.5, 0.5]
     block_num_list = [2, 2]
@@ -21,18 +20,49 @@ def demo():
     generated_texture = texture_generator.generateTexture(
         image, patch_sample_percent_list, block_num_list, print_progress)
 
+    cv2.imshow("generated_texture", generated_texture)
+    cv2.waitKey(0)
+    return True
+
+
+def demo_repeat():
+    image_file_path = "/home/chli/chLi/texture/flower.png"
+
+    assert os.path.exists(image_file_path)
+    image = cv2.imread(image_file_path)
+
+    texture_generator = TextureGenerator()
     width_repeat_texture = texture_generator.generateRepeatTexture(
-        image, height_repeat=False, print_progress=print_progress)
+        image, height_repeat=False)
 
     height_repeat_texture = texture_generator.generateRepeatTexture(
-        image, width_repeat=False, print_progress=print_progress)
+        image, width_repeat=False)
 
-    repeat_texture = texture_generator.generateRepeatTexture(
-        image, print_progress)
+    repeat_texture = texture_generator.generateRepeatTexture(image)
 
-    cv2.imshow("generated_texture", generated_texture)
     cv2.imshow("width_repeat_texture", width_repeat_texture)
     cv2.imshow("height_repeat_texture", height_repeat_texture)
     cv2.imshow("repeat_texture", repeat_texture)
     cv2.waitKey(0)
+    return True
+
+
+def demo_trans():
+    image_file_path = "/home/chli/chLi/texture/Image/flower.png"
+    save_texture_folder_path = "/home/chli/chLi/texture/Texture/flower/"
+
+    texture_generator = TextureGenerator()
+    texture_generator.transImageToAllRepeatTexture(image_file_path,
+                                                   save_texture_folder_path)
+    return True
+
+
+def demo_trans_folder():
+    image_folder_path = "/home/chli/chLi/texture/Image/"
+    save_texture_folder_path = "/home/chli/chLi/texture/Texture/"
+    print_progress = True
+
+    texture_generator = TextureGenerator()
+    texture_generator.transImageFolderToAllRepeatTexture(
+        image_folder_path, save_texture_folder_path, print_progress)
     return True
