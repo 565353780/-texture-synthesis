@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import cv2
 import numpy as np
 from tqdm import tqdm
 
@@ -27,4 +28,9 @@ class TextureManager(object):
                            width_idx * texture_shape[1]:(width_idx + 1) *
                            texture_shape[1]] = texture
 
+        cv2.rectangle(repeat_texture, (0, 0), (texture_shape[1], texture_shape[0]), (0, 255, 0), 2)
+
+        scale = 1.0
+        if scale != 1.0:
+            repeat_texture = cv2.resize(repeat_texture, None, fx=scale, fy=scale)
         return repeat_texture
