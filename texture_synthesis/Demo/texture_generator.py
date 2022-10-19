@@ -10,8 +10,8 @@ from texture_synthesis.Module.texture_generator import TextureGenerator
 def demo():
     image_file_path = "./data/input1.jpg"
     image_file_path = "/home/chli/chLi/texture/flower.png"
-    patch_sample_percent = 0.3
-    block_num_list = (4, 4)
+    patch_sample_percent_list = [0.5, 0.5]
+    block_num_list = [2, 2]
     print_progress = True
 
     assert os.path.exists(image_file_path)
@@ -19,7 +19,7 @@ def demo():
 
     texture_generator = TextureGenerator()
     generated_texture = texture_generator.generateTexture(
-        image, patch_sample_percent, block_num_list, print_progress)
+        image, patch_sample_percent_list, block_num_list, print_progress)
 
     width_repeat_texture = texture_generator.generateRepeatTexture(
         image, height_repeat=False, print_progress=print_progress)
