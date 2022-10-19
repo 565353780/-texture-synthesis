@@ -23,12 +23,12 @@ def getRandomPatch(texture, block_size):
 def getL2OverlapDiffError(patch, block_size, overlap, result, y, x):
     error = 0
     if x > 0:
-        left = patch[:, :overlap] - result[y:y + block_size[1],
+        left = patch[:, :overlap[0]] - result[y:y + block_size[1],
                                            x:x + overlap[0]]
         error += np.sum(left**2)
 
     if y > 0:
-        up = patch[:overlap, :] - result[y:y + overlap[1], x:x + block_size[0]]
+        up = patch[:overlap[1], :] - result[y:y + overlap[1], x:x + block_size[0]]
         error += np.sum(up**2)
 
     if x > 0 and y > 0:
