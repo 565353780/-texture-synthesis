@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from texture_synthesis.Method.path import createFileFolder, renameFile
 from texture_synthesis.Method.patch import getRandomPatch, getRandomBestPatch, getMinCutPatch
+from texture_synthesis.Method.cut import getBlockImage
 
 
 class TextureGenerator(object):
@@ -18,6 +19,7 @@ class TextureGenerator(object):
     def generateTexture(self,
                         image,
                         patch_sample_percent_list,
+                        patch_overlap_percent_list,
                         block_num_list,
                         print_progress=False):
         texture = image / 255.0
@@ -27,7 +29,10 @@ class TextureGenerator(object):
             for i in range(2)
         ]
 
-        overlap = [block_size[i] // 6 for i in range(2)]
+        overlap = [
+            int(block_size[i] * patch_overlap_percent_list[i])
+            for i in range(2)
+        ]
 
         block_width_num, block_height_num = block_num_list
 
@@ -62,20 +67,22 @@ class TextureGenerator(object):
             result[y:y + block_size[1], x:x + block_size[0]] = patch
 
         generated_texture = (result * 255).astype(np.uint8)
-        return generated_texture, image.shape[:2], overlap
+        return generated_texture, block_size, overlap
 
     def generateWidthRepeatTexture(self, image, print_progress=False):
-        texture, image_shape, overlap = self.generateTexture(
-            image, [1.0, 1.0], [3, 1], print_progress)
+        texture, block_size, overlap = self.generateTexture(
+            image, [0.9, 0.9], [0.9, 0.9], [3, 1], print_progress)
 
-        width_start = int(image_shape[1] - 0.5 * overlap[0])
-        width_end = int(2 * image_shape[1] - 1.5 * overlap[0])
+        #  return getBlockImage(texture, block_size, overlap, [1, 2], [0, 1])
+
+        width_start = int(block_size[0] - 0.5 * overlap[0])
+        width_end = int(2 * block_size[0] - 1.5 * overlap[0])
 
         return texture[:, width_start:width_end]
 
     def generateHeightRepeatTexture(self, image, print_progress=False):
         texture, image_shape, overlap = self.generateTexture(
-            image, [1.0, 1.0], [1, 3], print_progress)
+            image, [0.9, 0.9], [0.9, 0.9], [1, 3], print_progress)
 
         height_start = int(image_shape[0] - 0.5 * overlap[1])
         height_end = int(2 * image_shape[0] - 1.5 * overlap[1])
@@ -84,7 +91,7 @@ class TextureGenerator(object):
 
     def generateWidthAndHeightRepeatTexture(self, image, print_progress=False):
         texture, image_shape, overlap = self.generateTexture(
-            image, [1.0, 1.0], [3, 3], print_progress)
+            image, [0.9, 0.9], [0.9, 0.9], [3, 3], print_progress)
 
         width_start = int(image_shape[1] - 0.5 * overlap[0])
         width_end = int(2 * image_shape[1] - 1.5 * overlap[0])
