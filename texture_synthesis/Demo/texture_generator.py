@@ -8,17 +8,22 @@ from texture_synthesis.Module.texture_generator import TextureGenerator
 
 
 def demo():
-    image_file_path = "/home/chli/chLi/texture/flower.png"
-    patch_sample_percent_list = [0.5, 0.5]
-    block_num_list = [2, 2]
+    image_file_path = "/home/chli/chLi/texture/图片/11.jpg"
+    patch_sample_percent_list = [0.9, 0.9]
+    patch_overlap_percent_list = [0.9, 0.9]
+    block_num_list = [3, 3]
     print_progress = True
 
     assert os.path.exists(image_file_path)
     image = cv2.imread(image_file_path)
 
     texture_generator = TextureGenerator()
-    generated_texture = texture_generator.generateTexture(
-        image, patch_sample_percent_list, block_num_list, print_progress)
+    generated_texture, image_shape, overlap = texture_generator.generateTexture(
+        image, patch_sample_percent_list, patch_overlap_percent_list,
+        block_num_list, print_progress)
+
+    print("image_shape :", image_shape)
+    print("overlap :", overlap)
 
     cv2.imshow("generated_texture", generated_texture)
     cv2.waitKey(0)
@@ -85,7 +90,7 @@ def demo_trans_all():
 
 
 def demo_trans_folder_all():
-    image_folder_path = "/home/chli/chLi/texture/Image/"
+    image_folder_path = "/home/chli/chLi/texture/图片/"
     save_texture_folder_path = "/home/chli/chLi/texture/Texture/"
     print_progress = True
 
