@@ -8,7 +8,7 @@ from texture_synthesis.Module.texture_manager import TextureManager
 
 
 def demo():
-    texture_folder_path = "/home/chli/chLi/texture/Texture/木纹/柚木/"
+    texture_folder_path = "/home/chli/chLi/texture/Texture/11/"
 
     width_texture_file_path = texture_folder_path + "width_repeat.png"
     width_repeat_size = [3, 1]
