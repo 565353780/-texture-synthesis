@@ -10,7 +10,8 @@ from texture_synthesis.Demo.texture_generator import \
     demo_trans_folder_all as demo_trans_image_folder_to_all_texture
 
 from texture_synthesis.Demo.texture_manager import \
-    demo as demo_manage_texture
+    demo as demo_manage_texture, \
+    demo_folder as demo_manage_texture_folder
 
 if __name__ == "__main__":
     #  demo_generate_texture()
@@ -18,6 +19,7 @@ if __name__ == "__main__":
     #  demo_trans_image_to_texture()
     #  demo_trans_image_folder_to_texture()
     #  demo_trans_image_to_all_texture()
-
     demo_trans_image_folder_to_all_texture()
-    demo_manage_texture()
+
+    #  demo_manage_texture()
+    demo_manage_texture_folder()
