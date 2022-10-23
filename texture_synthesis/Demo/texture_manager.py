@@ -8,7 +8,22 @@ from texture_synthesis.Module.texture_manager import TextureManager
 
 
 def demo():
-    texture_folder_path = "/home/chli/chLi/texture/Texture/11/"
+    texture_file_path = "/home/chli/chLi/texture/test.png"
+    repeat_size = [3, 3]
+
+    assert os.path.exists(texture_file_path)
+    texture = cv2.imread(texture_file_path)
+
+    texture_manager = TextureManager()
+    repeat_texture = texture_manager.renderRepeatTexture(texture, repeat_size)
+
+    cv2.imshow("repeat_texture", repeat_texture)
+    cv2.waitKey(0)
+    return True
+
+
+def demo_folder():
+    texture_folder_path = "/home/chli/chLi/texture/Texture/图片/11/"
 
     width_texture_file_path = texture_folder_path + "width_repeat.png"
     width_repeat_size = [3, 1]
