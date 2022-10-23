@@ -90,7 +90,7 @@ def demo_trans_all():
 
 
 def demo_trans_folder_all():
-    image_folder_path = "/home/chli/chLi/texture/图片/"
+    image_folder_path = "/home/chli/chLi/texture/Image/"
     save_texture_folder_path = "/home/chli/chLi/texture/Texture/"
     print_progress = True
 
