@@ -76,19 +76,25 @@ class TextureGenerator(object):
                               width_repeat=True,
                               height_repeat=True,
                               print_progress=False):
+        pre_generate = False
+
         if not width_repeat and not height_repeat:
             return image
 
-        pre_patch_sample_percent_list = [0.8, 0.8]
-        pre_patch_overlap_percent_list = [0.9, 0.9]
-        pre_block_num_list = [2, 2]
+        if pre_generate:
+            pre_patch_sample_percent_list = [0.8, 0.8]
+            pre_patch_overlap_percent_list = [0.9, 0.9]
+            pre_block_num_list = [2, 2]
 
-        pre_texture, _, _ = self.generateTexture(
-            image, pre_patch_sample_percent_list,
-            pre_patch_overlap_percent_list, pre_block_num_list, print_progress)
+            pre_texture, _, _ = self.generateTexture(
+                image, pre_patch_sample_percent_list,
+                pre_patch_overlap_percent_list, pre_block_num_list,
+                print_progress)
 
-        #  cv2.imshow("pre_texture", pre_texture)
-        #  cv2.waitKey(5000)
+            #  cv2.imshow("pre_texture", pre_texture)
+            #  cv2.waitKey(5000)
+        else:
+            pre_texture = image
 
         patch_sample_percent_list = [1.0, 1.0]
         patch_overlap_percent_list = [0.2, 0.2]
@@ -186,10 +192,21 @@ class TextureGenerator(object):
 
         image = cv2.imread(image_file_path)
 
+        if print_progress:
+            print("[INFO][TextureGenerator::transImageToRepeatTexture]")
+            print("\t start trans image to width and height repeat texture...")
         repeat_texture = self.generateRepeatTexture(image, True, True,
                                                     print_progress)
+
+        if print_progress:
+            print("[INFO][TextureGenerator::transImageToRepeatTexture]")
+            print("\t start trans image to width repeat texture...")
         width_repeat_texture = self.generateRepeatTexture(
             image, True, False, print_progress)
+
+        if print_progress:
+            print("[INFO][TextureGenerator::transImageToRepeatTexture]")
+            print("\t start trans image to height repeat texture...")
         height_repeat_texture = self.generateRepeatTexture(
             image, False, True, print_progress)
 
