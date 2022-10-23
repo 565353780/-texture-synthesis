@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import cv2
 import numpy as np
 from tqdm import tqdm
 
-from texture_synthesis.Method.path import createFileFolder, renameFile
-from texture_synthesis.Method.patch import getRandomPatch, getRandomBestPatch, getMinCutPatch
 from texture_synthesis.Method.cut import getBlockImage
+from texture_synthesis.Method.patch import (getMinCutPatch, getRandomBestPatch,
+                                            getRandomPatch)
+from texture_synthesis.Method.path import createFileFolder, renameFile
 
 
 class TextureGenerator(object):
@@ -69,50 +71,50 @@ class TextureGenerator(object):
         generated_texture = (result * 255).astype(np.uint8)
         return generated_texture, block_size, overlap
 
-    def generateWidthRepeatTexture(self, image, print_progress=False):
-        texture, block_size, overlap = self.generateTexture(
-            image, [0.9, 0.9], [0.9, 0.9], [3, 1], print_progress)
-
-        #  return getBlockImage(texture, block_size, overlap, [1, 2], [0, 1])
-
-        width_start = int(block_size[0] - 0.5 * overlap[0])
-        width_end = int(2 * block_size[0] - 1.5 * overlap[0])
-
-        return texture[:, width_start:width_end]
-
-    def generateHeightRepeatTexture(self, image, print_progress=False):
-        texture, image_shape, overlap = self.generateTexture(
-            image, [0.9, 0.9], [0.9, 0.9], [1, 3], print_progress)
-
-        height_start = int(image_shape[0] - 0.5 * overlap[1])
-        height_end = int(2 * image_shape[0] - 1.5 * overlap[1])
-
-        return texture[height_start:height_end, :]
-
-    def generateWidthAndHeightRepeatTexture(self, image, print_progress=False):
-        texture, image_shape, overlap = self.generateTexture(
-            image, [0.9, 0.9], [0.9, 0.9], [3, 3], print_progress)
-
-        width_start = int(image_shape[1] - 0.5 * overlap[0])
-        width_end = int(2 * image_shape[1] - 1.5 * overlap[0])
-
-        height_start = int(image_shape[0] - 0.5 * overlap[1])
-        height_end = int(2 * image_shape[0] - 1.5 * overlap[1])
-
-        return texture[height_start:height_end, width_start:width_end]
-
     def generateRepeatTexture(self,
                               image,
                               width_repeat=True,
                               height_repeat=True,
                               print_progress=False):
+        if not width_repeat and not height_repeat:
+            return image
+
+        pre_patch_sample_percent_list = [0.8, 0.8]
+        pre_patch_overlap_percent_list = [0.9, 0.9]
+        pre_block_num_list = [2, 2]
+
+        pre_texture, _, _ = self.generateTexture(
+            image, pre_patch_sample_percent_list,
+            pre_patch_overlap_percent_list, pre_block_num_list, print_progress)
+
+        #  cv2.imshow("pre_texture", pre_texture)
+        #  cv2.waitKey(5000)
+
+        patch_sample_percent_list = [1.0, 1.0]
+        patch_overlap_percent_list = [0.2, 0.2]
+        block_num_list = [1, 1]
+        width_block_range = [0, 1]
+        height_block_range = [0, 1]
+
         if width_repeat:
-            if height_repeat:
-                return self.generateWidthAndHeightRepeatTexture(
-                    image, print_progress)
-            return self.generateWidthRepeatTexture(image, print_progress)
+            block_num_list[0] = 3
+            width_block_range = [1, 2]
+
         if height_repeat:
-            return self.generateHeightRepeatTexture(image, print_progress)
+            block_num_list[1] = 3
+            height_block_range = [1, 2]
+
+        texture, block_size, overlap = self.generateTexture(
+            pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
+            block_num_list, print_progress)
+
+        #  cut = getBlockImage(texture, block_num_list, block_size, overlap,
+        #  width_block_range, height_block_range)
+        #  cv2.imshow("cut", cut)
+        #  cv2.waitKey(5000)
+
+        return getBlockImage(texture, block_num_list, block_size, overlap,
+                             width_block_range, height_block_range)
 
     def transImageToRepeatTexture(self,
                                   image_file_path,
@@ -184,20 +186,20 @@ class TextureGenerator(object):
 
         image = cv2.imread(image_file_path)
 
+        repeat_texture = self.generateRepeatTexture(image, True, True,
+                                                    print_progress)
         width_repeat_texture = self.generateRepeatTexture(
             image, True, False, print_progress)
         height_repeat_texture = self.generateRepeatTexture(
             image, False, True, print_progress)
-        repeat_texture = self.generateRepeatTexture(image, True, True,
-                                                    print_progress)
 
         os.makedirs(save_texture_folder_path, exist_ok=True)
 
+        cv2.imwrite(save_texture_folder_path + "repeat.png", repeat_texture)
         cv2.imwrite(save_texture_folder_path + "width_repeat.png",
                     width_repeat_texture)
         cv2.imwrite(save_texture_folder_path + "height_repeat.png",
                     height_repeat_texture)
-        cv2.imwrite(save_texture_folder_path + "repeat.png", repeat_texture)
         return True
 
     def transImageFolderToAllRepeatTexture(self,
@@ -238,7 +240,8 @@ class TextureGenerator(object):
                                                                             -1] + "_tmp/"
 
             self.transImageToAllRepeatTexture(image_file_path,
-                                              tmp_save_texture_folder_path)
+                                              tmp_save_texture_folder_path,
+                                              print_progress)
 
             renameFile(current_save_texture_folder_path[:-1] + "_tmp/",
                        current_save_texture_folder_path)
