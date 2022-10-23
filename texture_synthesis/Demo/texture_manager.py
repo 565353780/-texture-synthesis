@@ -8,7 +8,7 @@ from texture_synthesis.Module.texture_manager import TextureManager
 
 
 def demo():
-    texture_file_path = "/home/chli/chLi/texture/test.png"
+    texture_file_path = "/home/chli/chLi/texture/RustTexture/图片/11.png"
     repeat_size = [3, 3]
 
     assert os.path.exists(texture_file_path)
