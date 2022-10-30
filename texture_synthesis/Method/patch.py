@@ -24,11 +24,12 @@ def getL2OverlapDiffError(patch, block_size, overlap, result, y, x):
     error = 0
     if x > 0:
         left = patch[:, :overlap[0]] - result[y:y + block_size[1],
-                                           x:x + overlap[0]]
+                                              x:x + overlap[0]]
         error += np.sum(left**2)
 
     if y > 0:
-        up = patch[:overlap[1], :] - result[y:y + overlap[1], x:x + block_size[0]]
+        up = patch[:overlap[1], :] - result[y:y + overlap[1],
+                                            x:x + block_size[0]]
         error += np.sum(up**2)
 
     if x > 0 and y > 0:
@@ -63,8 +64,16 @@ def getMinCutPath(errors):
     seen = set()
 
     path = None
+    run_num = 10
+    run_idx = 0
     while pq:
+        run_idx += 1
         error, path = heapq.heappop(pq)
+        print("===========")
+        print(error)
+        print(path)
+        if run_idx >= run_num:
+            exit()
         curDepth = len(path)
         curIndex = path[-1]
 
@@ -81,6 +90,7 @@ def getMinCutPath(errors):
                     seen.add((curDepth, nextIndex))
     return path
 
+import open3d as o3d
 
 def getMinCutPatch(patch, overlap, result, y, x):
     patch = patch.copy()
@@ -96,6 +106,19 @@ def getMinCutPatch(patch, overlap, result, y, x):
     if y > 0:
         up = patch[:overlap[1], :] - result[y:y + overlap[1], x:x + dx]
         upL2 = np.sum(up**2, axis=2)
+
+        points = []
+        for i in range(up.shape[0]):
+            for j in range(up.shape[1]):
+                points.append([i, j, 1000 * upL2[i][j]])
+        points = np.array(points)
+        colors = np.zeros_like(points)
+        colors[:, 0] = 1.0
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(points)
+        pcd.colors = o3d.utility.Vector3dVector(colors)
+        o3d.visualization.draw_geometries([pcd])
+        exit()
         for j, i in enumerate(getMinCutPath(upL2.T)):
             minCut[:i, j] = True
 
