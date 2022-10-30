@@ -19,7 +19,8 @@ from texture_synthesis.Demo.texture_manager import \
 
 if __name__ == "__main__":
     #  demo_generate_texture()
-    #  demo_generate_repeat_texture()
+    demo_generate_repeat_texture()
+    exit()
     #  demo_trans_image_to_texture()
     #  demo_trans_image_folder_to_texture()
     #  demo_trans_image_to_all_texture()
