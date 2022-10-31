@@ -65,17 +65,10 @@ def getMinCutPath(errors):
     h, w = errors.shape
     seen = set()
 
+    error = float('inf')
     path = None
-    run_num = 10
-    run_idx = 0
     while pq:
-        run_idx += 1
         error, path = heapq.heappop(pq)
-        print("===========")
-        print(error)
-        print(path)
-        if run_idx >= run_num:
-            exit()
         curDepth = len(path)
         curIndex = path[-1]
 
@@ -90,29 +83,31 @@ def getMinCutPath(errors):
                     cumError = error + errors[curDepth, nextIndex]
                     heapq.heappush(pq, (cumError, path + [nextIndex]))
                     seen.add((curDepth, nextIndex))
-    return path
+    return path, error
 
 
-def getMinCutPatch(patch, overlap, result, y, x):
+def getMinCutPatch(patch, overlap, result, y, x, norm=2):
     patch = patch.copy()
     dy, dx, _ = patch.shape
     minCut = np.zeros_like(patch, dtype=bool)
 
+    x_error = 0
     if x > 0:
         left = patch[:, :overlap[0]] - result[y:y + dy, x:x + overlap[0]]
-        leftL2 = np.sum(left**2, axis=2)
-        for i, j in enumerate(getMinCutPath(leftL2)):
+        left_abs = np.absolute(left)
+        leftL2 = np.sum(left_abs**norm, axis=2)
+        path, x_error = getMinCutPath(leftL2)
+        for i, j in enumerate(path):
             minCut[i, :j] = True
 
+    y_error = 0
     if y > 0:
         up = patch[:overlap[1], :] - result[y:y + overlap[1], x:x + dx]
-        upL2 = np.sum(up**2, axis=2)
-
-        renderMinCutPatch(upL2)
-        exit()
-
-        for j, i in enumerate(getMinCutPath(upL2.T)):
+        up_abs = np.absolute(up)
+        upL2 = np.sum(up_abs**norm, axis=2)
+        path, y_error = getMinCutPath(upL2.T)
+        for j, i in enumerate(path):
             minCut[:i, j] = True
 
     np.copyto(patch, result[y:y + dy, x:x + dx], where=minCut)
-    return patch
+    return patch, x_error, y_error
