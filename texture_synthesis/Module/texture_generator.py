@@ -8,8 +8,7 @@ import numpy as np
 from tqdm import tqdm
 
 from texture_synthesis.Method.cut import getBlockImage
-from texture_synthesis.Method.patch import (getMinCutPatch, getRandomBestPatch,
-                                            getRandomPatch)
+from texture_synthesis.Method.patch import getMinCutPatch, getRandomBestPatch, getRandomPatch
 from texture_synthesis.Method.path import createFileFolder, renameFile
 
 
@@ -64,7 +63,7 @@ class TextureGenerator(object):
             else:
                 patch = getRandomBestPatch(texture, block_size, overlap,
                                            result, y, x)
-                patch = getMinCutPatch(patch, overlap, result, y, x)
+                patch, x_error, y_error = getMinCutPatch(patch, overlap, result, y, x)
 
             result[y:y + block_size[1], x:x + block_size[0]] = patch
 
