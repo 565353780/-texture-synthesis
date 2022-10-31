@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import cv2
 import numpy as np
 import open3d as o3d
+from copy import deepcopy
 
 
 def renderMinCutPatch(dist_map):
@@ -26,4 +28,20 @@ def renderMinCutPatch(dist_map):
     pcd.points = o3d.utility.Vector3dVector(points)
     pcd.colors = o3d.utility.Vector3dVector(colors)
     o3d.visualization.draw_geometries([pcd])
+    return True
+
+
+def renderTransImageBox(image, trans_matrix_inv, wait_key=0):
+    render_image = deepcopy(image)
+    point_list = np.array([
+        [0, 0, 1],
+        [0, image.shape[1], 1],
+        [image.shape[0], 0, 1],
+        [image.shape[0], image.shape[1], 1],
+    ]).T
+    trans_points = np.dot(trans_matrix_inv, point_list).T[:, [1, 0]]
+    trans_points = trans_points[[0, 1, 3, 2]].reshape(1, -1, 2).astype(int)
+    cv2.polylines(render_image, trans_points, True, [0, 255, 0])
+    cv2.imshow("TransImageBox", render_image)
+    cv2.waitKey(wait_key)
     return True
