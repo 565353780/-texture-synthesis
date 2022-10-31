@@ -4,8 +4,9 @@
 import numpy as np
 from tqdm import tqdm
 
-from texture_synthesis.Method.patch import getMinCutPatch, getRandomBestPatch, getRandomPatch
-from texture_synthesis.Method.matrix import getTransMatrix
+from texture_synthesis.Method.patch import (getMinCutPatch, getRandomBestPatch,
+                                            getRandomPatch)
+from texture_synthesis.Method.trans import getBiggerImage
 
 
 def generateTexture(image,
@@ -67,13 +68,12 @@ def generateBestTexture(image,
                         patch_overlap_percent_list,
                         block_num_list,
                         print_progress=False):
-    point_pair_list = [
-        [[0, 0], [1, 1]],
-        [[1, 0], [2, 1]],
-        [[0, 1], [1, 2]],
-        [[1, 1], [2, 2]],
+    scale = 0.1
+    expand_scale_list_list = [
+        [0, 0],
+        [scale, scale],
     ]
-    trans_matrix = getTransMatrix(point_pair_list)
+    bigger_image = getBiggerImage(image, expand_scale_list_list)
     exit()
 
     min_error = float('inf')
