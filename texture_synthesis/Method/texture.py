@@ -5,6 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 from texture_synthesis.Method.patch import getMinCutPatch, getRandomBestPatch, getRandomPatch
+from texture_synthesis.Method.matrix import getTransMatrix
 
 
 def generateTexture(image,
@@ -53,9 +54,45 @@ def generateTexture(image,
             patch = getRandomBestPatch(texture, block_size, overlap, result, y,
                                        x)
             patch, error = getMinCutPatch(patch, overlap, result, y, x)
-            error += error_sum
+            error_sum += error
 
         result[y:y + block_size[1], x:x + block_size[0]] = patch
 
     generated_texture = (result * 255).astype(np.uint8)
     return generated_texture, block_size, overlap, error_sum
+
+
+def generateBestTexture(image,
+                        patch_sample_percent_list,
+                        patch_overlap_percent_list,
+                        block_num_list,
+                        print_progress=False):
+    point_pair_list = [
+        [[0, 0], [1, 1]],
+        [[1, 0], [2, 1]],
+        [[0, 1], [1, 2]],
+        [[1, 1], [2, 2]],
+    ]
+    trans_matrix = getTransMatrix(point_pair_list)
+    exit()
+
+    min_error = float('inf')
+    best_generated_texture = None
+    best_block_size = None
+    best_overlap = None
+
+    for i in range(1, overlap_sample_num):
+        patch_overlap_percent_list = [
+            1.0 * i / overlap_sample_num, 1.0 * i / overlap_sample_num
+        ]
+        generated_texture, block_size, overlap, error_sum = generateTexture(
+            image, patch_sample_percent_list, patch_overlap_percent_list,
+            block_num_list, print_progress)
+        print(error_sum)
+        if error_sum < min_error:
+            print(min_error, "->", error_sum)
+            min_error = error_sum
+            best_generated_texture = generated_texture
+            best_block_size = block_size
+            best_overlap = overlap
+    return best_generated_texture, best_block_size, best_overlap, min_error
