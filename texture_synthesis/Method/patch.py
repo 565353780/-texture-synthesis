@@ -86,28 +86,29 @@ def getMinCutPath(errors):
     return path, error
 
 
-def getMinCutPatch(patch, overlap, result, y, x, norm=2):
+def getMinCutPatch(patch, overlap, result, y, x):
     patch = patch.copy()
     dy, dx, _ = patch.shape
     minCut = np.zeros_like(patch, dtype=bool)
 
-    x_error = 0
+    error = 0
     if x > 0:
         left = patch[:, :overlap[0]] - result[y:y + dy, x:x + overlap[0]]
         left_abs = np.absolute(left)
-        leftL2 = np.sum(left_abs**norm, axis=2)
+        leftL2 = np.sum(left_abs**2, axis=2)
         path, x_error = getMinCutPath(leftL2)
         for i, j in enumerate(path):
             minCut[i, :j] = True
+        error += x_error
 
-    y_error = 0
     if y > 0:
         up = patch[:overlap[1], :] - result[y:y + overlap[1], x:x + dx]
         up_abs = np.absolute(up)
-        upL2 = np.sum(up_abs**norm, axis=2)
+        upL2 = np.sum(up_abs**2, axis=2)
         path, y_error = getMinCutPath(upL2.T)
         for j, i in enumerate(path):
             minCut[:i, j] = True
+        error += y_error
 
     np.copyto(patch, result[y:y + dy, x:x + dx], where=minCut)
-    return patch, x_error, y_error
+    return patch, error
