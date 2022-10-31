@@ -4,6 +4,8 @@
 import heapq
 import numpy as np
 
+from texture_synthesis.Method.render import renderMinCutPatch
+
 
 def getRandomPatch(texture, block_size):
     h, w = texture.shape[:2]
@@ -90,7 +92,6 @@ def getMinCutPath(errors):
                     seen.add((curDepth, nextIndex))
     return path
 
-import open3d as o3d
 
 def getMinCutPatch(patch, overlap, result, y, x):
     patch = patch.copy()
@@ -107,18 +108,9 @@ def getMinCutPatch(patch, overlap, result, y, x):
         up = patch[:overlap[1], :] - result[y:y + overlap[1], x:x + dx]
         upL2 = np.sum(up**2, axis=2)
 
-        points = []
-        for i in range(up.shape[0]):
-            for j in range(up.shape[1]):
-                points.append([i, j, 1000 * upL2[i][j]])
-        points = np.array(points)
-        colors = np.zeros_like(points)
-        colors[:, 0] = 1.0
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(points)
-        pcd.colors = o3d.utility.Vector3dVector(colors)
-        o3d.visualization.draw_geometries([pcd])
+        renderMinCutPatch(upL2)
         exit()
+
         for j, i in enumerate(getMinCutPath(upL2.T)):
             minCut[:i, j] = True
 
