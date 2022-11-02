@@ -35,9 +35,9 @@ def renderTransImageBox(image, trans_matrix_inv, wait_key=0):
     render_image = deepcopy(image)
     point_list = np.array([
         [0, 0, 1],
-        [0, image.shape[1], 1],
-        [image.shape[0], 0, 1],
-        [image.shape[0], image.shape[1], 1],
+        [0, render_image.shape[1], 1],
+        [render_image.shape[0], 0, 1],
+        [render_image.shape[0], render_image.shape[1], 1],
     ]).T
     trans_points = np.dot(trans_matrix_inv, point_list).T[:, [1, 0]]
     trans_points = trans_points[[0, 1, 3, 2]].reshape(1, -1, 2).astype(int)
