@@ -7,13 +7,16 @@ import cv2
 from tqdm import tqdm
 
 from texture_synthesis.Method.cut import getBlockImage
-from texture_synthesis.Method.texture import generateTexture, generateBestTexture
+from texture_synthesis.Method.texture import generateTexture
 from texture_synthesis.Method.path import createFileFolder, renameFile
+
+from texture_synthesis.Module.texture_optimizer import TextureOptimizer
 
 
 class TextureGenerator(object):
 
     def __init__(self):
+        self.texture_optimizer = TextureOptimizer()
         return
 
     def generateRepeatTexture(self,
@@ -44,7 +47,7 @@ class TextureGenerator(object):
         patch_sample_percent_list = [1.0, 1.0]
         patch_overlap_percent_list = [0.2, 0.2]
         block_num_list = [1, 1]
-        scale_max_list = [0.1, 0.1]
+        scale_max_list = [0.1, 0.1, 0.1, 0.1]
         width_block_range = [0, 1]
         height_block_range = [0, 1]
 
@@ -56,8 +59,11 @@ class TextureGenerator(object):
             block_num_list[1] = 3
             height_block_range = [1, 2]
 
-        #  texture, block_size, overlap, _ = generateTexture(
-        texture, block_size, overlap, _ = generateBestTexture(
+        best_scale_list = self.texture_optimizer.generateBestTexture(
+            pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
+            block_num_list, scale_max_list)
+
+        texture, block_size, overlap, error_max = generateBiggerTexture(
             pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
             block_num_list, scale_max_list, print_progress)
 
