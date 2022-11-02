@@ -67,13 +67,14 @@ def generateBestTexture(image,
                         patch_sample_percent_list,
                         patch_overlap_percent_list,
                         block_num_list,
+                        scale_max_list=[0.1, 0.1],
                         print_progress=False):
-    scale = 0.1
+
     expand_scale_list_list = [
-        [0, 0],
-        [scale, scale],
+        scale_max_list,
+        scale_max_list,
     ]
-    bigger_image = getBiggerImage(image, expand_scale_list_list)
+    bigger_image = getBiggerImage(image, expand_scale_list_list, True)
     exit()
 
     min_error = float('inf')
