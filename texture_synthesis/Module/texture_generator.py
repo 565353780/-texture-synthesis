@@ -44,6 +44,7 @@ class TextureGenerator(object):
         patch_sample_percent_list = [1.0, 1.0]
         patch_overlap_percent_list = [0.2, 0.2]
         block_num_list = [1, 1]
+        scale_max_list = [0.1, 0.1]
         width_block_range = [0, 1]
         height_block_range = [0, 1]
 
@@ -58,7 +59,7 @@ class TextureGenerator(object):
         #  texture, block_size, overlap, _ = generateTexture(
         texture, block_size, overlap, _ = generateBestTexture(
             pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
-            block_num_list, print_progress)
+            block_num_list, scale_max_list, print_progress)
 
         #  cut = getBlockImage(texture, block_num_list, block_size, overlap,
         #  width_block_range, height_block_range)
