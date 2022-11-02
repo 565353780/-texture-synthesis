@@ -63,37 +63,17 @@ def generateTexture(image,
     return generated_texture, block_size, overlap, error_sum
 
 
-def generateBestTexture(image,
-                        patch_sample_percent_list,
-                        patch_overlap_percent_list,
-                        block_num_list,
-                        scale_max_list=[0.1, 0.1],
-                        print_progress=False):
+def generateBiggerTexture(image,
+                          patch_sample_percent_list,
+                          patch_overlap_percent_list,
+                          block_num_list,
+                          scale_list=[0.1, 0.1, 0.1, 0.1],
+                          print_progress=False):
 
-    expand_scale_list_list = [
-        scale_max_list,
-        scale_max_list,
-    ]
+    expand_scale_list_list = [[scale_list[0], scale_list[1]],
+                              [scale_list[2], scale_list[3]]]
     bigger_image = getBiggerImage(image, expand_scale_list_list, True)
-    exit()
 
-    min_error = float('inf')
-    best_generated_texture = None
-    best_block_size = None
-    best_overlap = None
-
-    for i in range(1, overlap_sample_num):
-        patch_overlap_percent_list = [
-            1.0 * i / overlap_sample_num, 1.0 * i / overlap_sample_num
-        ]
-        generated_texture, block_size, overlap, error_sum = generateTexture(
-            image, patch_sample_percent_list, patch_overlap_percent_list,
-            block_num_list, print_progress)
-        print(error_sum)
-        if error_sum < min_error:
-            print(min_error, "->", error_sum)
-            min_error = error_sum
-            best_generated_texture = generated_texture
-            best_block_size = block_size
-            best_overlap = overlap
-    return best_generated_texture, best_block_size, best_overlap, min_error
+    return generateTexture(bigger_image, patch_sample_percent_list,
+                           patch_overlap_percent_list, block_num_list,
+                           print_progress)
