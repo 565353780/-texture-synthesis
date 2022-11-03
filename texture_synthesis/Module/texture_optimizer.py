@@ -39,9 +39,9 @@ class TextureOptimizer(object):
             self.patch_overlap_percent_list, self.block_num_list, scale_list)
         return error_sum
 
-    def generateBestTexture(self, image, patch_sample_percent_list,
-                            patch_overlap_percent_list, block_num_list,
-                            scale_max_list):
+    def getBestScaleListByScipy(self, image, patch_sample_percent_list,
+                                patch_overlap_percent_list, block_num_list,
+                                scale_max_list):
         self.loadImage(image, patch_sample_percent_list,
                        patch_overlap_percent_list, block_num_list)
 
@@ -83,9 +83,32 @@ class TextureOptimizer(object):
         init_scale_list = np.asarray(scale_max_list, dtype=np.float64) / 2.0
         res = minimize(self.generateBiggerTexture,
                        init_scale_list,
+                       method='SLSQP',
                        constraints=cons)
         print(res.fun)
         print(res.success)
         print(res.x)
         exit()
         return res.x
+
+    def getBestScaleListBySample(self, image, patch_sample_percent_list,
+                                 patch_overlap_percent_list, block_num_list,
+                                 scale_max_list):
+        return None
+
+    def getBestScaleList(self, image, patch_sample_percent_list,
+                         patch_overlap_percent_list, block_num_list,
+                         scale_max_list):
+        mode_list = ['scipy', 'sample']
+        mode = 'sample'
+        if mode == 'scipy':
+            return self.getBestScaleListByScipy(image,
+                                                patch_sample_percent_list,
+                                                patch_overlap_percent_list,
+                                                block_num_list, scale_max_list)
+        if mode == 'sample':
+            return self.getBestScaleListBySample(image,
+                                                 patch_sample_percent_list,
+                                                 patch_overlap_percent_list,
+                                                 block_num_list,
+                                                 scale_max_list)
