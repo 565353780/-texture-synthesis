@@ -11,9 +11,10 @@ def demo():
         '1': '木纹/22-02木纹09/repeat.png',
         '2': '木纹/22-02木纹10/repeat.png',
         '3': '木纹/22-02木纹12/repeat.png',
+        '4': '木纹/北美黑胡桃/repeat.png',
     }
 
-    render_file_idx = 0
+    render_file_idx = 4
     repeat_size = [3, 3]
     scale = 0.5
     wait_key = 0
