@@ -129,19 +129,19 @@ class TextureGenerator(object):
         image = cv2.imread(image_file_path)
 
         if print_progress:
-            print("[INFO][TextureGenerator::transImageToRepeatTexture]")
+            print("[INFO][TextureGenerator::transImageToAllRepeatTexture]")
             print("\t start trans image to width and height repeat texture...")
         repeat_texture = self.generateRepeatTexture(image, True, True,
                                                     print_progress)
 
         if print_progress:
-            print("[INFO][TextureGenerator::transImageToRepeatTexture]")
+            print("[INFO][TextureGenerator::transImageToAllRepeatTexture]")
             print("\t start trans image to width repeat texture...")
         width_repeat_texture = self.generateRepeatTexture(
             image, True, False, print_progress)
 
         if print_progress:
-            print("[INFO][TextureGenerator::transImageToRepeatTexture]")
+            print("[INFO][TextureGenerator::transImageToAllRepeatTexture]")
             print("\t start trans image to height repeat texture...")
         height_repeat_texture = self.generateRepeatTexture(
             image, False, True, print_progress)
@@ -178,12 +178,13 @@ class TextureGenerator(object):
                     current_save_texture_folder_path,
                 ])
 
-        for_data = file_path_pair_list
-        if print_progress:
-            print("[INFO][TextureGenerator::transImageFolderToRepeatTexture]")
-            print("\t start trans image to repeat texture...")
-            for_data = tqdm(file_path_pair_list)
-        for file_path_pair in for_data:
+        for i, file_path_pair in enumerate(file_path_pair_list):
+            if print_progress:
+                print(
+                    "[INFO][TextureGenerator::transImageFolderToRepeatTexture]"
+                )
+                print("\t start trans image to repeat texture, " + str(i + 1) +
+                      "/" + str(len(file_path_pair_list)) + "...")
             image_file_path, current_save_texture_folder_path = file_path_pair
 
             if os.path.exists(current_save_texture_folder_path):
