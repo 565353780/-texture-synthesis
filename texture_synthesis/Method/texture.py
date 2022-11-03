@@ -68,11 +68,14 @@ def generateBiggerTexture(image,
                           patch_overlap_percent_list,
                           block_num_list,
                           scale_list=[0.1, 0.1, 0.1, 0.1],
+                          render_bigger_image=False,
+                          wait_key=0,
                           print_progress=False):
 
     expand_scale_list_list = [[scale_list[0], scale_list[1]],
                               [scale_list[2], scale_list[3]]]
-    bigger_image = getBiggerImage(image, expand_scale_list_list, True)
+    bigger_image = getBiggerImage(image, expand_scale_list_list,
+                                  render_bigger_image, wait_key)
 
     return generateTexture(bigger_image, patch_sample_percent_list,
                            patch_overlap_percent_list, block_num_list,
