@@ -61,7 +61,7 @@ class TextureGenerator(object):
             block_num_list[1] = 3
             height_block_range = [1, 2]
 
-        best_scale_list = self.texture_optimizer.generateBestTexture(
+        best_scale_list = self.texture_optimizer.getBestScaleList(
             pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
             block_num_list, scale_max_list)
 
