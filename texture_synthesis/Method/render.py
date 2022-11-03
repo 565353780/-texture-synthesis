@@ -60,14 +60,17 @@ def getRepeatedTexture(texture, repeat_size, scale=1.0):
     return repeat_texture
 
 
-def renderRepeatedTexture(repeat_texture_file_path, repeat_size):
+def renderRepeatedTexture(repeat_texture_file_path,
+                          repeat_size,
+                          scale=1.0,
+                          wait_key=0):
     assert os.path.exists(repeat_texture_file_path)
 
     repeat_texture = cv2.imread(repeat_texture_file_path)
 
-    repeated_texture = getRepeatedTexture(repeat_texture, repeat_size)
+    repeated_texture = getRepeatedTexture(repeat_texture, repeat_size, scale)
     cv2.imshow("repeated_texture", repeated_texture)
-    cv2.waitKey(0)
+    cv2.waitKey(wait_key)
     return True
 
 
