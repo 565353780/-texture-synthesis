@@ -45,7 +45,7 @@ class TextureOptimizer(object):
         self.loadImage(image, patch_sample_percent_list,
                        patch_overlap_percent_list, block_num_list)
 
-        cons = {
+        cons = (
             {
                 'type': 'ineq',
                 'fun': lambda x: x[0]
@@ -78,9 +78,9 @@ class TextureOptimizer(object):
                 'type': 'ineq',
                 'fun': lambda x: scale_max_list[3] - x[3]
             },
-        }
+        )
 
-        init_scale_list = np.asarray([0.0, 0.0, 0.0, 0.0], dtype=np.float64)
+        init_scale_list = np.asarray(scale_max_list, dtype=np.float64) / 2.0
         res = minimize(self.generateBiggerTexture,
                        init_scale_list,
                        constraints=cons)
