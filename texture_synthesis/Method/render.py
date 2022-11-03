@@ -60,13 +60,24 @@ def getRepeatedTexture(texture, repeat_size, scale=1.0):
     return repeat_texture
 
 
-def renderRepeatedTexture(image_file_path, repeat_size,
-                          save_repeated_texture_file_path):
-    assert os.path.exists(image_file_path)
+def renderRepeatedTexture(repeat_texture_file_path, repeat_size):
+    assert os.path.exists(repeat_texture_file_path)
 
-    texture = cv2.imread(image_file_path)
+    repeat_texture = cv2.imread(repeat_texture_file_path)
 
-    repeated_texture = getRepeatedTexture(texture, repeat_size)
+    repeated_texture = getRepeatedTexture(repeat_texture, repeat_size)
+    cv2.imshow("repeated_texture", repeated_texture)
+    cv2.waitKey(0)
+    return True
+
+
+def saveRepeatedTexture(repeat_texture_file_path, repeat_size,
+                        save_repeated_texture_file_path):
+    assert os.path.exists(repeat_texture_file_path)
+
+    repeat_texture = cv2.imread(repeat_texture_file_path)
+
+    repeated_texture = getRepeatedTexture(repeat_texture, repeat_size)
 
     createFileFolder(save_repeated_texture_file_path)
     cv2.imwrite(save_repeated_texture_file_path, repeated_texture)
