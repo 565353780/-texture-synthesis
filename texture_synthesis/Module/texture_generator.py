@@ -7,7 +7,7 @@ import cv2
 from tqdm import tqdm
 
 from texture_synthesis.Method.cut import getBlockImage
-from texture_synthesis.Method.texture import generateTexture
+from texture_synthesis.Method.texture import generateTexture, generateBiggerTexture
 from texture_synthesis.Method.path import createFileFolder, renameFile
 
 from texture_synthesis.Module.texture_optimizer import TextureOptimizer
@@ -48,6 +48,8 @@ class TextureGenerator(object):
         patch_overlap_percent_list = [0.2, 0.2]
         block_num_list = [1, 1]
         scale_max_list = [0.1, 0.1, 0.1, 0.1]
+        render_bigger_image = False
+        wait_key = 0
         width_block_range = [0, 1]
         height_block_range = [0, 1]
 
@@ -65,7 +67,8 @@ class TextureGenerator(object):
 
         texture, block_size, overlap, error_max = generateBiggerTexture(
             pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
-            block_num_list, scale_max_list, print_progress)
+            block_num_list, best_scale_list, render_bigger_image, wait_key,
+            print_progress)
 
         #  cut = getBlockImage(texture, block_num_list, block_size, overlap,
         #  width_block_range, height_block_range)
