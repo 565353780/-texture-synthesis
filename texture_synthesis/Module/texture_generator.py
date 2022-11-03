@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-
 import cv2
-from tqdm import tqdm
 
 from texture_synthesis.Method.cut import getBlockImage
 from texture_synthesis.Method.texture import generateBiggerTexture
@@ -99,12 +97,13 @@ class TextureGenerator(object):
                 file_path_pair_list.append(
                     [image_file_path, save_texture_file_path])
 
-        for_data = file_path_pair_list
-        if print_progress:
-            print("[INFO][TextureGenerator::transImageFolderToRepeatTexture]")
-            print("\t start trans image to repeat texture...")
-            for_data = tqdm(file_path_pair_list)
-        for file_path_pair in for_data:
+        for i, file_path_pair in enumerate(file_path_pair_list):
+            if print_progress:
+                print(
+                    "[INFO][TextureGenerator::transImageFolderToRepeatTexture]"
+                )
+                print("\t start trans image to repeat texture, " + str(i + 1) +
+                      "/" + str(len(file_path_pair_list)) + "...")
             image_file_path, save_texture_file_path = file_path_pair
 
             if os.path.exists(save_texture_file_path):
