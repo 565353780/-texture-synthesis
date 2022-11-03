@@ -7,7 +7,7 @@ import cv2
 from tqdm import tqdm
 
 from texture_synthesis.Method.cut import getBlockImage
-from texture_synthesis.Method.texture import generateTexture, generateBiggerTexture
+from texture_synthesis.Method.texture import generateBiggerTexture
 from texture_synthesis.Method.path import createFileFolder, renameFile
 
 from texture_synthesis.Module.texture_optimizer import TextureOptimizer
@@ -24,30 +24,10 @@ class TextureGenerator(object):
                               width_repeat=True,
                               height_repeat=True,
                               print_progress=False):
-        pre_generate = False
-
-        if not width_repeat and not height_repeat:
-            return image
-
-        if pre_generate:
-            pre_patch_sample_percent_list = [0.8, 0.8]
-            pre_patch_overlap_percent_list = [0.9, 0.9]
-            pre_block_num_list = [2, 2]
-
-            pre_texture, _, _, _ = generateTexture(
-                image, pre_patch_sample_percent_list,
-                pre_patch_overlap_percent_list, pre_block_num_list,
-                print_progress)
-
-            #  cv2.imshow("pre_texture", pre_texture)
-            #  cv2.waitKey(5000)
-        else:
-            pre_texture = image
-
         patch_sample_percent_list = [1.0, 1.0]
         patch_overlap_percent_list = [0.2, 0.2]
         block_num_list = [1, 1]
-        scale_max_list = [0.1, 0.1, 0.1, 0.1]
+        scale_max_list = [0.5, 0.5, 0.5, 0.5]
         render_bigger_image = False
         wait_key = 0
         width_block_range = [0, 1]
@@ -62,11 +42,11 @@ class TextureGenerator(object):
             height_block_range = [1, 2]
 
         best_scale_list = self.texture_optimizer.getBestScaleList(
-            pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
-            block_num_list, scale_max_list)
+            image, patch_sample_percent_list, patch_overlap_percent_list,
+            block_num_list, scale_max_list, print_progress)
 
-        texture, block_size, overlap, error_max = generateBiggerTexture(
-            pre_texture, patch_sample_percent_list, patch_overlap_percent_list,
+        texture, block_size, overlap, _ = generateBiggerTexture(
+            image, patch_sample_percent_list, patch_overlap_percent_list,
             block_num_list, best_scale_list, render_bigger_image, wait_key,
             print_progress)
 
