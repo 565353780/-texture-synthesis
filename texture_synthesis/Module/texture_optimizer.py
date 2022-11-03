@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import numpy as np
+from tqdm import tqdm
 from scipy.optimize import minimize
+from multiprocessing import Pool
 
 from texture_synthesis.Method.texture import generateBiggerTexture
 
@@ -39,12 +42,7 @@ class TextureOptimizer(object):
             self.patch_overlap_percent_list, self.block_num_list, scale_list)
         return error_sum
 
-    def getBestScaleListByScipy(self, image, patch_sample_percent_list,
-                                patch_overlap_percent_list, block_num_list,
-                                scale_max_list):
-        self.loadImage(image, patch_sample_percent_list,
-                       patch_overlap_percent_list, block_num_list)
-
+    def getBestScaleListByScipy(self, scale_max_list):
         cons = (
             {
                 'type': 'ineq',
@@ -85,30 +83,67 @@ class TextureOptimizer(object):
                        init_scale_list,
                        method='SLSQP',
                        constraints=cons)
-        print(res.fun)
-        print(res.success)
-        print(res.x)
-        exit()
+        if not res.success:
+            print("[ERROR][TextureOptimizer::getBestScaleListByScipy]")
+            print("\t minimize failed! return zero scale list!")
+            return [0.0, 0.0, 0.0, 0.0]
         return res.x
 
-    def getBestScaleListBySample(self, image, patch_sample_percent_list,
-                                 patch_overlap_percent_list, block_num_list,
-                                 scale_max_list):
-        return None
+    def getBestScaleListBySample(self,
+                                 scale_max_list,
+                                 sample_num,
+                                 print_progress=False):
+        assert sample_num > 0
 
-    def getBestScaleList(self, image, patch_sample_percent_list,
-                         patch_overlap_percent_list, block_num_list,
-                         scale_max_list):
+        if sample_num == 1:
+            return [0.0, 0.0, 0.0, 0.0]
+
+        sample_scale_list_list = []
+        for i in range(sample_num):
+            for j in range(sample_num):
+                for k in range(sample_num):
+                    for l in range(sample_num):
+                        sample_scale_list_list.append([
+                            1.0 * scale_max_list[0] * i / (sample_num - 1),
+                            1.0 * scale_max_list[1] * j / (sample_num - 1),
+                            1.0 * scale_max_list[2] * k / (sample_num - 1),
+                            1.0 * scale_max_list[3] * l / (sample_num - 1)
+                        ])
+
+        with Pool(os.cpu_count()) as pool:
+            if print_progress:
+                print("[INFO][TextureOptimizer::getBestScaleListBySample]")
+                print("\t start sample scale list...")
+                result = list(
+                    tqdm(pool.imap(self.generateBiggerTexture,
+                                   sample_scale_list_list),
+                         total=len(sample_scale_list_list)))
+            else:
+                result = list(
+                    pool.imap(self.generateBiggerTexture,
+                              sample_scale_list_list))
+
+        min_error_sample_scale_idx = np.argmin(result)
+        return sample_scale_list_list[min_error_sample_scale_idx]
+
+    def getBestScaleList(self,
+                         image,
+                         patch_sample_percent_list,
+                         patch_overlap_percent_list,
+                         block_num_list,
+                         scale_max_list,
+                         print_progress=False):
         mode_list = ['scipy', 'sample']
         mode = 'sample'
+
+        assert mode in mode_list
+
+        self.loadImage(image, patch_sample_percent_list,
+                       patch_overlap_percent_list, block_num_list)
+
         if mode == 'scipy':
-            return self.getBestScaleListByScipy(image,
-                                                patch_sample_percent_list,
-                                                patch_overlap_percent_list,
-                                                block_num_list, scale_max_list)
+            return self.getBestScaleListByScipy(scale_max_list)
         if mode == 'sample':
-            return self.getBestScaleListBySample(image,
-                                                 patch_sample_percent_list,
-                                                 patch_overlap_percent_list,
-                                                 block_num_list,
-                                                 scale_max_list)
+            sample_num = 4
+            return self.getBestScaleListBySample(scale_max_list, sample_num,
+                                                 print_progress)
