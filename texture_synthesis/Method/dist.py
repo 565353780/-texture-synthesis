@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import os
+import cv2
 import numpy as np
 from tqdm import trange
+from copy import deepcopy
 from multiprocessing import Pool
 
 from texture_synthesis.Data.patch import Patch
@@ -115,3 +117,27 @@ def getPatchDistMatrixWithPool(image, patch_size):
 
     patch_dist_matrix = np.array(result).reshape(image_width, image_height)
     return patch_dist_matrix
+
+
+def getBestMatchPatch(image, patch):
+    patch_image = getPatchImage(image, patch)
+    if patch_image is None:
+        return None, -1
+
+    x_min = patch.start_pixel.x
+    y_min = patch.start_pixel.y
+    x_max = patch.end_pixel.x
+    y_max = patch.end_pixel.y
+
+    search_image = deepcopy(image)
+    search_image[y_min:y_max, x_min:x_max, :] = 0
+
+    similar_matrix = cv2.matchTemplate(search_image, patch_image,
+                                       cv2.TM_CCOEFF_NORMED)
+
+    _, max_value, _, max_loc = cv2.minMaxLoc(similar_matrix)
+
+    best_match_patch = Patch.fromList(
+        [[max_loc[0], max_loc[1]],
+         [max_loc[0] + x_max - x_min, max_loc[1] + y_max - y_min]])
+    return best_match_patch, max_value

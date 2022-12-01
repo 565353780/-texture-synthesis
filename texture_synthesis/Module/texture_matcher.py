@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from copy import deepcopy
-
 import cv2
 import numpy as np
 from tqdm import tqdm, trange
 
 from texture_synthesis.Data.patch import Patch
-from texture_synthesis.Method.dist import (getPatchDistMatrixWithPool,
-                                           getPatchImage)
+from texture_synthesis.Method.dist import getBestMatchPatch, getPatchImage
 
 
 class TextureMatcher(object):
@@ -158,43 +155,18 @@ class TextureMatcher(object):
                     patch_1 = Patch.fromList(
                         [[x, y],
                          [x + search_patch_size, y + search_patch_size]])
-                    patch_image = getPatchImage(image, patch_1)
-                    if patch_image is None:
+                    best_match_patch, match_score = getBestMatchPatch(
+                        image, patch_1)
+                    if best_match_patch is None:
                         continue
 
-                    search_image = deepcopy(image)
-                    search_image[y:y + search_patch_size,
-                                 x:x + search_patch_size, :] = 0
+                    cv2.rectangle(image, patch_1.start_pixel.toList(),
+                                  patch_1.end_pixel.toList(), (0, 255, 0), 2)
+                    cv2.rectangle(image, best_match_patch.start_pixel.toList(),
+                                  best_match_patch.end_pixel.toList(), (255, 0, 0), 2)
 
-                    result = cv2.matchTemplate(search_image, patch_image,
-                                               cv2.TM_CCOEFF_NORMED)
-
-                    cv2.rectangle(
-                        search_image, (x, y),
-                        (x + search_patch_size, y + search_patch_size),
-                        (0, 255, 0), 2)
-
-                    _, max_value, _, max_loc = cv2.minMaxLoc(result)
-
-                    patch_2 = Patch.fromList(
-                        [[max_loc[0], max_loc[1]],
-                         [
-                             max_loc[0] + search_patch_size,
-                             max_loc[1] + search_patch_size
-                         ]])
-
-                    cv2.rectangle(search_image, max_loc,
-                                  (max_loc[0] + search_patch_size,
-                                   max_loc[1] + search_patch_size),
-                                  (0, 255, 0), 2)
-
-                    match_patch_image = getPatchImage(image, patch_2)
-
-                    cv2.imshow("search_image", search_image)
-                    cv2.imshow("patch_image", patch_image)
-                    cv2.imshow("template result", result)
-                    cv2.imshow("match_patch_image", match_patch_image)
-                    cv2.waitKey(0)
+                    cv2.imshow("image", image)
+                    cv2.waitKey(5000)
                     exit()
         return True
 
