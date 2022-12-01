@@ -12,8 +12,7 @@ from texture_synthesis.Demo.texture_matcher import demo as demo_match_repeat_tex
 if __name__ == "__main__":
     #  demo_generate_repeat_texture()
 
-    demo_match_repeat_texture()
-    exit()
+    #  demo_match_repeat_texture()
 
     demo_trans_image_folder_to_all_texture()
 

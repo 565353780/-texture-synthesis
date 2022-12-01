@@ -8,12 +8,14 @@ from texture_synthesis.Method.cut import getBlockImage
 from texture_synthesis.Method.texture import generateBiggerTexture
 from texture_synthesis.Method.path import createFileFolder, renameFile
 
+from texture_synthesis.Module.texture_matcher import TextureMatcher
 from texture_synthesis.Module.texture_optimizer import TextureOptimizer
 
 
 class TextureGenerator(object):
 
     def __init__(self):
+        self.texture_matcher = TextureMatcher()
         self.texture_optimizer = TextureOptimizer()
         return
 
@@ -39,12 +41,14 @@ class TextureGenerator(object):
             block_num_list[1] = 3
             height_block_range = [1, 2]
 
+        no_repeat_image = self.texture_matcher.matchRepeatTexture(image)
+
         best_scale_list = self.texture_optimizer.getBestScaleList(
-            image, patch_sample_percent_list, patch_overlap_percent_list,
+            no_repeat_image, patch_sample_percent_list, patch_overlap_percent_list,
             block_num_list, scale_max_list, print_progress)
 
         texture, block_size, overlap, _ = generateBiggerTexture(
-            image, patch_sample_percent_list, patch_overlap_percent_list,
+            no_repeat_image, patch_sample_percent_list, patch_overlap_percent_list,
             block_num_list, best_scale_list, render_bigger_image, wait_key,
             print_progress)
 
