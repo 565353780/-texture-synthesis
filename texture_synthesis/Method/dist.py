@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+from copy import deepcopy
+from multiprocessing import Pool
+
 import cv2
 import numpy as np
 from tqdm import trange
-from copy import deepcopy
-from multiprocessing import Pool
 
 from texture_synthesis.Data.patch import Patch
 
@@ -135,9 +136,69 @@ def getBestMatchPatch(image, patch):
     similar_matrix = cv2.matchTemplate(search_image, patch_image,
                                        cv2.TM_CCOEFF_NORMED)
 
-    _, max_value, _, max_loc = cv2.minMaxLoc(similar_matrix)
+    _, match_score, _, start_pixel = cv2.minMaxLoc(similar_matrix)
 
     best_match_patch = Patch.fromList(
-        [[max_loc[0], max_loc[1]],
-         [max_loc[0] + x_max - x_min, max_loc[1] + y_max - y_min]])
-    return best_match_patch, max_value
+        [[start_pixel[0], start_pixel[1]],
+         [start_pixel[0] + x_max - x_min, start_pixel[1] + y_max - y_min]])
+    return best_match_patch, match_score
+
+
+def getAllBestMatchPatch(image, patch, min_match_score=0.5, max_match_num=-1):
+    best_match_patch_list = []
+    match_score_list = []
+
+    search_image = deepcopy(image)
+
+    best_match_score = -float('inf')
+
+    while True:
+        best_match_patch, match_score = getBestMatchPatch(search_image, patch)
+        best_match_score = max(best_match_score, match_score)
+        if match_score < min_match_score or \
+                match_score < min_match_score * best_match_score:
+            break
+
+        best_match_patch_list.append(best_match_patch)
+        match_score_list.append(match_score)
+
+        if max_match_num > 0 and len(best_match_patch_list) == max_match_num:
+            break
+
+        x_min = best_match_patch.start_pixel.x
+        y_min = best_match_patch.start_pixel.y
+        x_max = best_match_patch.end_pixel.x
+        y_max = best_match_patch.end_pixel.y
+        search_image[y_min:y_max, x_min:x_max, :] = 0
+
+    return best_match_patch_list, match_score_list
+
+
+def getBestMatchPatchList(image,
+                          patch_size_list,
+                          min_match_score=0.5,
+                          max_match_num=-1):
+    best_match_patch_list = []
+    best_match_score = -float('inf')
+    if len(patch_size_list) == 0:
+        return best_match_patch_list, best_match_score
+
+    image_height, image_width, _ = image.shape
+
+    for patch_size in patch_size_list:
+        print("[INFO][dist::getBestMatchPatchList]")
+        print("\t start check patch size :", patch_size, "...")
+        for x in trange(0, image_width, patch_size):
+            for y in range(0, image_height, patch_size):
+                patch = Patch.fromList([[x, y],
+                                        [x + patch_size, y + patch_size]])
+                current_best_match_patch_list, match_score_list = getAllBestMatchPatch(
+                    image, patch)
+                if len(current_best_match_patch_list) == 0:
+                    continue
+
+                mean_match_score = np.mean(match_score_list)
+                if mean_match_score > best_match_score:
+                    best_match_score = mean_match_score
+                    best_match_patch_list = current_best_match_patch_list
+    return best_match_patch_list, best_match_score

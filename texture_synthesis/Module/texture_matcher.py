@@ -6,7 +6,8 @@ import numpy as np
 from tqdm import tqdm, trange
 
 from texture_synthesis.Data.patch import Patch
-from texture_synthesis.Method.dist import getBestMatchPatch, getPatchImage
+from texture_synthesis.Method.dist import \
+    getBestMatchPatchList, getPatchImage
 
 
 class TextureMatcher(object):
@@ -146,28 +147,14 @@ class TextureMatcher(object):
         return True
 
     def matchRepeatTextureByTemplate(self, image):
-        search_patch_size_list = [100]
-        image_height, image_width, _ = image.shape
+        patch_size_list = [100]
 
-        for search_patch_size in search_patch_size_list:
-            for x in range(image_width):
-                for y in range(image_height):
-                    patch_1 = Patch.fromList(
-                        [[x, y],
-                         [x + search_patch_size, y + search_patch_size]])
-                    best_match_patch, match_score = getBestMatchPatch(
-                        image, patch_1)
-                    if best_match_patch is None:
-                        continue
+        best_match_patch_list, best_match_score = getBestMatchPatchList(
+            image, patch_size_list)
 
-                    cv2.rectangle(image, patch_1.start_pixel.toList(),
-                                  patch_1.end_pixel.toList(), (0, 255, 0), 2)
-                    cv2.rectangle(image, best_match_patch.start_pixel.toList(),
-                                  best_match_patch.end_pixel.toList(), (255, 0, 0), 2)
-
-                    cv2.imshow("image", image)
-                    cv2.waitKey(5000)
-                    exit()
+        for best_match_patch in best_match_patch_list:
+            cv2.rectangle(image, best_match_patch.start_pixel.toList(),
+                          best_match_patch.end_pixel.toList(), (0, 0, 255), 2)
         return True
 
     def matchRepeatTexture(self, image):
