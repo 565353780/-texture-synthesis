@@ -7,8 +7,13 @@ from texture_synthesis.Demo.texture_generator import \
 
 from texture_synthesis.Demo.render import demo as demo_render_repeat_texture
 
+from texture_synthesis.Demo.texture_matcher import demo as demo_match_repeat_texture
+
 if __name__ == "__main__":
     #  demo_generate_repeat_texture()
+
+    demo_match_repeat_texture()
+    exit()
 
     demo_trans_image_folder_to_all_texture()
 
