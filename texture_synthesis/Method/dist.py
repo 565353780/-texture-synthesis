@@ -175,23 +175,25 @@ def getAllBestMatchPatch(image, patch, min_match_score=0.5, max_match_num=-1):
 
 
 def getBestMatchPatchList(image,
-                          patch_size_list,
+                          patch_percent_list,
                           min_match_score=0.5,
                           max_match_num=-1):
     best_match_patch_list = []
     best_match_score = -float('inf')
-    if len(patch_size_list) == 0:
+    if len(patch_percent_list) == 0:
         return best_match_patch_list, best_match_score
 
     image_height, image_width, _ = image.shape
 
-    for patch_size in patch_size_list:
+    for patch_percent in patch_percent_list:
         print("[INFO][dist::getBestMatchPatchList]")
-        print("\t start check patch size :", patch_size, "...")
-        for x in trange(0, image_width, patch_size):
-            for y in range(0, image_height, patch_size):
+        print("\t start check patch percent :", patch_percent, "...")
+        patch_width = int(patch_percent * image_width)
+        patch_height = int(patch_percent * image_height)
+        for x in trange(0, image_width, patch_width):
+            for y in range(0, image_height, patch_height):
                 patch = Patch.fromList([[x, y],
-                                        [x + patch_size, y + patch_size]])
+                                        [x + patch_width, y + patch_height]])
                 current_best_match_patch_list, match_score_list = getAllBestMatchPatch(
                     image, patch)
                 if len(current_best_match_patch_list) == 0:

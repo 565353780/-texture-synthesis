@@ -3,6 +3,7 @@
 
 import cv2
 import numpy as np
+from copy import deepcopy
 from tqdm import tqdm, trange
 
 from texture_synthesis.Data.patch import Patch
@@ -147,14 +148,20 @@ class TextureMatcher(object):
         return True
 
     def matchRepeatTextureByTemplate(self, image):
-        patch_size_list = [100]
+        patch_percent_list = [0.2, 0.3, 0.4]
 
         best_match_patch_list, best_match_score = getBestMatchPatchList(
-            image, patch_size_list)
+            image, patch_percent_list)
+
+        match_image = deepcopy(image)
 
         for best_match_patch in best_match_patch_list:
-            cv2.rectangle(image, best_match_patch.start_pixel.toList(),
+            cv2.rectangle(match_image, best_match_patch.start_pixel.toList(),
                           best_match_patch.end_pixel.toList(), (0, 0, 255), 2)
+
+        print('best_match_score =', best_match_score)
+        cv2.imshow('match_image', match_image)
+        cv2.waitKey(0)
         return True
 
     def matchRepeatTexture(self, image):
