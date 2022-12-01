@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from copy import deepcopy
+
 import cv2
 import numpy as np
-from copy import deepcopy
 from tqdm import tqdm, trange
 
 from texture_synthesis.Data.patch import Patch
-from texture_synthesis.Method.dist import getPatchImage, getPatchDistMatrixWithPool
+from texture_synthesis.Method.dist import (getPatchDistMatrixWithPool,
+                                           getPatchImage)
 
 
 class TextureMatcher(object):
 
     def __init__(self):
-        self.sift = cv2.xfeatures2d.SIFT_create()
+        self.sift = cv2.SIFT_create()
 
         FLANN_INDEX_KDTREE = 0
         index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
@@ -163,18 +165,36 @@ class TextureMatcher(object):
                     search_image = deepcopy(image)
                     search_image[y:y + search_patch_size,
                                  x:x + search_patch_size, :] = 0
-                    print(search_image.shape)
-                    print(patch_image.shape)
-
-                    cv2.imshow("search_image", search_image)
-                    cv2.imshow("patch_image", patch_image)
-                    cv2.waitKey(5000)
 
                     result = cv2.matchTemplate(search_image, patch_image,
                                                cv2.TM_CCOEFF_NORMED)
 
+                    cv2.rectangle(
+                        search_image, (x, y),
+                        (x + search_patch_size, y + search_patch_size),
+                        (0, 255, 0), 2)
+
+                    _, max_value, _, max_loc = cv2.minMaxLoc(result)
+
+                    patch_2 = Patch.fromList(
+                        [[max_loc[0], max_loc[1]],
+                         [
+                             max_loc[0] + search_patch_size,
+                             max_loc[1] + search_patch_size
+                         ]])
+
+                    cv2.rectangle(search_image, max_loc,
+                                  (max_loc[0] + search_patch_size,
+                                   max_loc[1] + search_patch_size),
+                                  (0, 255, 0), 2)
+
+                    match_patch_image = getPatchImage(image, patch_2)
+
+                    cv2.imshow("search_image", search_image)
+                    cv2.imshow("patch_image", patch_image)
                     cv2.imshow("template result", result)
-                    cv2.waitKey(5000)
+                    cv2.imshow("match_patch_image", match_patch_image)
+                    cv2.waitKey(0)
                     exit()
         return True
 
