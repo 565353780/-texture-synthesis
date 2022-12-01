@@ -6,9 +6,9 @@ import numpy as np
 from copy import deepcopy
 from tqdm import tqdm, trange
 
-from texture_synthesis.Data.patch import Patch
 from texture_synthesis.Method.dist import \
     getBestMatchPatchList, getPatchImage
+from texture_synthesis.Method.cross import getBiggestNoCrossPatch
 
 
 class TextureMatcher(object):
@@ -147,22 +147,39 @@ class TextureMatcher(object):
             exit()
         return True
 
-    def matchRepeatTextureByTemplate(self, image):
+    def matchRepeatTextureByTemplate(self, image, render=False):
         patch_percent_list = [0.2, 0.3, 0.4]
 
         best_match_patch_list, best_match_score = getBestMatchPatchList(
             image, patch_percent_list)
 
-        match_image = deepcopy(image)
+        if render:
+            match_image = deepcopy(image)
 
-        for best_match_patch in best_match_patch_list:
-            cv2.rectangle(match_image, best_match_patch.start_pixel.toList(),
-                          best_match_patch.end_pixel.toList(), (0, 0, 255), 2)
+            for best_match_patch in best_match_patch_list:
+                cv2.rectangle(match_image,
+                              best_match_patch.start_pixel.toList(),
+                              best_match_patch.end_pixel.toList(), (0, 0, 255),
+                              2)
 
-        print('best_match_score =', best_match_score)
-        cv2.imshow('match_image', match_image)
+            print('best_match_score =', best_match_score)
+            cv2.imshow('match_image', match_image)
+            cv2.waitKey(0)
+
+        if len(best_match_patch_list) == 0:
+            return image
+
+        image_height, image_width, _ = image.shape
+        biggest_no_cross_patch = getBiggestNoCrossPatch(
+            best_match_patch_list, image_width, image_height)
+
+        biggest_no_repeat_texture = getPatchImage(image,
+                                                  biggest_no_cross_patch)
+
+        cv2.imshow("image", image)
+        cv2.imshow("texture", biggest_no_repeat_texture)
         cv2.waitKey(0)
-        return True
+        return biggest_no_repeat_texture
 
     def matchRepeatTexture(self, image):
         mode_list = ['sift', 'orb', 'orb_cut_image', 'patch_dist', 'template']
@@ -178,4 +195,4 @@ class TextureMatcher(object):
             return self.matchRepeatTextureByPatchDist(image)
         if mode == 'template':
             return self.matchRepeatTextureByTemplate(image)
-        return True
+        return None

@@ -14,9 +14,9 @@ class Patch(object):
         return
 
     def isValid(self):
-        if self.start_pixel.x > self.end_pixel.x:
+        if self.start_pixel.x >= self.end_pixel.x:
             return False
-        if self.start_pixel.y > self.end_pixel.y:
+        if self.start_pixel.y >= self.end_pixel.y:
             return False
         return True
 
@@ -24,6 +24,10 @@ class Patch(object):
     def fromList(cls, xy_xy_list):
         return cls(Pixel.fromList(xy_xy_list[0]),
                    Pixel.fromList(xy_xy_list[1]))
+
+    def getArea(self):
+        return (self.end_pixel.x - self.start_pixel.x +
+                1) * (self.end_pixel.y - self.start_pixel.y + 1)
 
     def toList(self):
         return [self.start_pixel.toList(), self.end_pixel.toList()]
