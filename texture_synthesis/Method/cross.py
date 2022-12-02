@@ -25,7 +25,10 @@ def isPatchCrossPatches(patch, patch_list):
     return False
 
 
-def getBiggestNoCrossPatch(patch_list, image_width, image_height):
+def getBiggestNoCrossPatch(patch_list,
+                           image_width,
+                           image_height,
+                           overlap_percent_list=[0.2, 0.2]):
     if len(patch_list) == 0:
         return None
     if len(patch_list) == 1:
@@ -94,15 +97,46 @@ def getBiggestNoCrossPatch(patch_list, image_width, image_height):
 
     if width_expand_patch_area >= height_expand_patch_area:
         if not isPatchCrossPatches(width_expand_patch, check_cross_patch_list):
-            return width_expand_patch
-        if not isPatchCrossPatches(height_expand_patch,
-                                   check_cross_patch_list):
-            return height_expand_patch
+            biggest_no_cross_patch = width_expand_patch
+        elif not isPatchCrossPatches(height_expand_patch,
+                                     check_cross_patch_list):
+            biggest_no_cross_patch = height_expand_patch
     else:
         if not isPatchCrossPatches(height_expand_patch,
                                    check_cross_patch_list):
-            return height_expand_patch
-        if not isPatchCrossPatches(width_expand_patch, check_cross_patch_list):
-            return width_expand_patch
+            biggest_no_cross_patch = height_expand_patch
+        elif not isPatchCrossPatches(width_expand_patch,
+                                     check_cross_patch_list):
+            biggest_no_cross_patch = width_expand_patch
+
+    start_patch_center = patch_list[start_patch_idx].getCenter()
+    biggest_no_cross_patch_center = biggest_no_cross_patch.getCenter()
+
+    min_start_pixel = [
+        image_width * overlap_percent_list[0],
+        image_height * overlap_percent_list[1]
+    ]
+
+    start_patch_to_min_start_pixel_diff = [
+        start_patch_center[0] - min_start_pixel[0],
+        start_patch_center[1] - min_start_pixel[1]
+    ]
+
+    biggest_no_cross_patch_to_start_patch_diff = [
+        biggest_no_cross_patch_center[0] - start_patch_center[0],
+        biggest_no_cross_patch_center[1] - start_patch_center[1]
+    ]
+
+    max_move_diff = [
+        -min(start_patch_to_min_start_pixel_diff[0],
+             biggest_no_cross_patch_to_start_patch_diff[0]),
+        -min(start_patch_to_min_start_pixel_diff[1],
+             biggest_no_cross_patch_to_start_patch_diff[1])
+    ]
+
+    biggest_no_cross_patch.move(max_move_diff)
+    biggest_no_cross_patch.scale(
+        [overlap_percent_list[0] + 1, overlap_percent_list[1] + 1], [0, 0],
+        [image_width - 1, image_height - 1])
 
     return biggest_no_cross_patch

@@ -147,7 +147,10 @@ class TextureMatcher(object):
             exit()
         return True
 
-    def matchRepeatTextureByTemplate(self, image, render=False):
+    def matchRepeatTextureByTemplate(self,
+                                     image,
+                                     overlap_percent_list=[0.2, 0.2],
+                                     render=False):
         patch_percent_list = [0.2, 0.3, 0.4]
 
         best_match_patch_list, best_match_score = getBestMatchPatchList(
@@ -172,7 +175,8 @@ class TextureMatcher(object):
 
         image_height, image_width, _ = image.shape
         biggest_no_cross_patch = getBiggestNoCrossPatch(
-            best_match_patch_list, image_width, image_height)
+            best_match_patch_list, image_width, image_height,
+            overlap_percent_list)
 
         biggest_no_repeat_texture = getPatchImage(image,
                                                   biggest_no_cross_patch)
@@ -183,7 +187,10 @@ class TextureMatcher(object):
             cv2.waitKey(0)
         return biggest_no_repeat_texture
 
-    def matchRepeatTexture(self, image, render=False):
+    def matchRepeatTexture(self,
+                           image,
+                           overlap_percent_list=[0.2, 0.2],
+                           render=False):
         mode_list = ['sift', 'orb', 'orb_cut_image', 'patch_dist', 'template']
         mode = 'template'
 
@@ -196,5 +203,7 @@ class TextureMatcher(object):
         if mode == 'patch_dist':
             return self.matchRepeatTextureByPatchDist(image)
         if mode == 'template':
-            return self.matchRepeatTextureByTemplate(image, render)
+            return self.matchRepeatTextureByTemplate(image,
+                                                     overlap_percent_list,
+                                                     render)
         return None

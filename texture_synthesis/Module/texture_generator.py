@@ -41,16 +41,18 @@ class TextureGenerator(object):
             block_num_list[1] = 3
             height_block_range = [1, 2]
 
-        no_repeat_image = self.texture_matcher.matchRepeatTexture(image)
+        no_repeat_image = self.texture_matcher.matchRepeatTexture(
+            image, patch_overlap_percent_list)
 
         best_scale_list = self.texture_optimizer.getBestScaleList(
-            no_repeat_image, patch_sample_percent_list, patch_overlap_percent_list,
-            block_num_list, scale_max_list, print_progress)
+            no_repeat_image, patch_sample_percent_list,
+            patch_overlap_percent_list, block_num_list, scale_max_list,
+            print_progress)
 
         texture, block_size, overlap, _ = generateBiggerTexture(
-            no_repeat_image, patch_sample_percent_list, patch_overlap_percent_list,
-            block_num_list, best_scale_list, render_bigger_image, wait_key,
-            print_progress)
+            no_repeat_image, patch_sample_percent_list,
+            patch_overlap_percent_list, block_num_list, best_scale_list,
+            render_bigger_image, wait_key, print_progress)
 
         #  cut = getBlockImage(texture, block_num_list, block_size, overlap,
         #  width_block_range, height_block_range)

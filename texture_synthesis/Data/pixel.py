@@ -13,6 +13,16 @@ class Pixel(object):
     def fromList(cls, xy_list):
         return cls(xy_list[0], xy_list[1])
 
+    def set(self, x, y):
+        self.x = int(x)
+        self.y = int(y)
+        return True
+
+    def move(self, move_list):
+        self.x += move_list[0]
+        self.y += move_list[1]
+        return True
+
     def toList(self):
         return [self.x, self.y]
 
