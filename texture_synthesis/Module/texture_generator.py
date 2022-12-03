@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+
 import cv2
 
 from texture_synthesis.Method.cut import getBlockImage
-from texture_synthesis.Method.texture import generateBiggerTexture
 from texture_synthesis.Method.path import createFileFolder, renameFile
-
+from texture_synthesis.Method.texture import generateBiggerTexture
 from texture_synthesis.Module.texture_matcher import TextureMatcher
 from texture_synthesis.Module.texture_optimizer import TextureOptimizer
 
@@ -23,20 +23,62 @@ class TextureGenerator(object):
                               image,
                               width_repeat=True,
                               height_repeat=True,
-                              print_progress=False):
-        patch_sample_percent_list = [1.0, 1.0]
-        patch_overlap_percent_list = [0.2, 0.2]
-        block_num_list = [1, 1]
-        scale_max_list = [0.5, 0.5, 0.5, 0.5]
-        render_bigger_image = False
-        wait_key = 0
+                              print_progress=False,
+                              patch_sample_percent_list=[1.0, 1.0],
+                              patch_overlap_percent_list=[0.2, 0.2],
+                              scale_max_list=[0.5, 0.5, 0.5, 0.5],
+                              render_bigger_image=False,
+                              wait_key=0):
+        '''
+        Input:
+            image: np.ndarray
+                source texture image
+            width_repeat: bool
+                whether repeat on width direction
+            height_repeat: bool
+                whether repeat on height direction
+            print_progress: bool
+                whether output the progress bar
+            patch_sample_percent_list: [width_sample_percent,
+                                        height_sample_percent]
+                width_sample_percent: float, 0-1
+                height_sample_percent: float, 0-1
+                to compute the size of the patch in image,
+                decide the final output texture size
+            patch_overlap_percent_list: [width_overlap_percent,
+                                         height_overlap_percent]
+                width_overlap_percent: float, 0-1
+                height_overlap_percent: float, 0-1
+                decide both the final output texture size and the quality of the texture bound
+                if it's bigger, the quality of the bound is higher,
+                but the final output texture size is smaller
+            scale_max_list: [leftup_width_scale_max,
+                             leftup_height_scale_max,
+                             rightup_width_scale_max,
+                             rightup_height_scale_max]
+                leftup_width_scale_max: float, 0-1
+                leftup_height_scale_max: float, 0-1
+                rightup_width_scale_max: float, 0-1
+                rightup_height_scale_max: float, 0-1
+                decide the transform search space,
+                the corners of source image can randomly moving in this scale-bigger areas
+            render_bigger_image: bool
+                whether to render the optimized image by the best transform
+            wait_key: int
+                which key to wait for cv2
+                0: wait until the user press Esc
+                k * 1000: wait k seconds
+
+            PS: the default params can adjust most images,
+                change them only when the result is not excepted is recommended
+        '''
+
+        block_num_list = [1, 1],
         width_block_range = [0, 1]
         height_block_range = [0, 1]
-
         if width_repeat:
             block_num_list[0] = 3
             width_block_range = [1, 2]
-
         if height_repeat:
             block_num_list[1] = 3
             height_block_range = [1, 2]
