@@ -195,7 +195,7 @@ def getBestMatchPatchList(image,
                 patch = Patch.fromList([[x, y],
                                         [x + patch_width, y + patch_height]])
                 current_best_match_patch_list, match_score_list = getAllBestMatchPatch(
-                    image, patch)
+                    image, patch, min_match_score, max_match_num)
                 if len(current_best_match_patch_list) == 0:
                     continue
 

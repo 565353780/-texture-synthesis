@@ -77,21 +77,21 @@ def getBiggestNoCrossPatch(patch_list,
             patch_expanded = True
             break
 
-    max_x = max(biggest_no_cross_patch.end_pixel.x, image_width)
-    max_y = max(biggest_no_cross_patch.end_pixel.y, image_height)
+    max_x = max(biggest_no_cross_patch.end_pixel.x, image_width - 1)
+    max_y = max(biggest_no_cross_patch.end_pixel.y, image_height - 1)
     width_height_expand_patch = Patch.fromList([[min_x, min_y], [max_x,
                                                                  max_y]])
     if not isPatchCrossPatches(width_height_expand_patch,
                                check_cross_patch_list):
         return width_height_expand_patch
 
-    max_x = max(biggest_no_cross_patch.end_pixel.x, image_width)
+    max_x = max(biggest_no_cross_patch.end_pixel.x, image_width-1)
     max_y = biggest_no_cross_patch.end_pixel.y
     width_expand_patch = Patch.fromList([[min_x, min_y], [max_x, max_y]])
     width_expand_patch_area = width_expand_patch.getArea()
 
     max_x = biggest_no_cross_patch.end_pixel.x
-    max_y = max(biggest_no_cross_patch.end_pixel.y, image_height)
+    max_y = max(biggest_no_cross_patch.end_pixel.y, image_height-1)
     height_expand_patch = Patch.fromList([[min_x, min_y], [max_x, max_y]])
     height_expand_patch_area = height_expand_patch.getArea()
 
@@ -138,5 +138,4 @@ def getBiggestNoCrossPatch(patch_list,
     biggest_no_cross_patch.scale(
         [overlap_percent_list[0] + 1, overlap_percent_list[1] + 1], [0, 0],
         [image_width - 1, image_height - 1])
-
     return biggest_no_cross_patch

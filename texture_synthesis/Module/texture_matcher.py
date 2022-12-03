@@ -152,9 +152,11 @@ class TextureMatcher(object):
                                      overlap_percent_list=[0.2, 0.2],
                                      render=False):
         patch_percent_list = [0.2, 0.3, 0.4]
+        min_match_score = 0.5
+        max_match_num = 10
 
         best_match_patch_list, best_match_score = getBestMatchPatchList(
-            image, patch_percent_list)
+            image, patch_percent_list, min_match_score, max_match_num)
 
         if render:
             match_image = deepcopy(image)
