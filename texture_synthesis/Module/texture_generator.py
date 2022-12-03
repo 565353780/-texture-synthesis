@@ -27,7 +27,7 @@ class TextureGenerator(object):
                               patch_sample_percent_list=[1.0, 1.0],
                               patch_overlap_percent_list=[0.2, 0.2],
                               scale_max_list=[0.5, 0.5, 0.5, 0.5],
-                              render_bigger_image=False,
+                              render=False,
                               wait_key=0):
         '''
         Input:
@@ -62,8 +62,8 @@ class TextureGenerator(object):
                 rightup_height_scale_max: float, 0-1
                 decide the transform search space,
                 the corners of source image can randomly moving in this scale-bigger areas
-            render_bigger_image: bool
-                whether to render the optimized image by the best transform
+            render: bool
+                whether to render the images during the process
             wait_key: int
                 which key to wait for cv2
                 0: wait until the user press Esc
@@ -73,7 +73,7 @@ class TextureGenerator(object):
                 change them only when the result is not excepted is recommended
         '''
 
-        block_num_list = [1, 1],
+        block_num_list = [1, 1]
         width_block_range = [0, 1]
         height_block_range = [0, 1]
         if width_repeat:
@@ -84,7 +84,7 @@ class TextureGenerator(object):
             height_block_range = [1, 2]
 
         no_repeat_image = self.texture_matcher.matchRepeatTexture(
-            image, patch_overlap_percent_list)
+            image, patch_overlap_percent_list, render, print_progress)
 
         best_scale_list = self.texture_optimizer.getBestScaleList(
             no_repeat_image, patch_sample_percent_list,
@@ -94,12 +94,13 @@ class TextureGenerator(object):
         texture, block_size, overlap, _ = generateBiggerTexture(
             no_repeat_image, patch_sample_percent_list,
             patch_overlap_percent_list, block_num_list, best_scale_list,
-            render_bigger_image, wait_key, print_progress)
+            render, wait_key, print_progress)
 
-        #  cut = getBlockImage(texture, block_num_list, block_size, overlap,
-        #  width_block_range, height_block_range)
-        #  cv2.imshow("cut", cut)
-        #  cv2.waitKey(5000)
+        if render:
+            cut = getBlockImage(texture, block_num_list, block_size, overlap,
+                                width_block_range, height_block_range)
+            cv2.imshow("cut", cut)
+            cv2.waitKey(5000)
 
         return getBlockImage(texture, block_num_list, block_size, overlap,
                              width_block_range, height_block_range)
