@@ -9,46 +9,25 @@ from texture_synthesis.Module.texture_generator import TextureGenerator
 
 def demo():
     image_file_path = "/home/chli/chLi/texture/Image/图片/11.jpg"
-    patch_sample_percent_list = [0.9, 0.9]
-    patch_overlap_percent_list = [0.9, 0.9]
-    block_num_list = [3, 3]
+    assert os.path.exists(image_file_path)
+    image = cv2.imread(image_file_path)
+    width_repeat = True
+    height_repeat = True
     print_progress = True
-
-    assert os.path.exists(image_file_path)
-    image = cv2.imread(image_file_path)
+    patch_sample_percent_list = [1.0, 1.0]
+    patch_overlap_percent_list = [0.2, 0.2]
+    scale_max_list = [0.5, 0.5, 0.5, 0.5]
+    render_bigger_image = False
+    wait_key = 0
 
     texture_generator = TextureGenerator()
-    generated_texture, image_shape, overlap = texture_generator.generateTexture(
-        image, patch_sample_percent_list, patch_overlap_percent_list,
-        block_num_list, print_progress)
+    generated_texture = texture_generator.generateRepeatTexture(
+        image, width_repeat, height_repeat, print_progress,
+        patch_sample_percent_list, patch_overlap_percent_list, scale_max_list,
+        render_bigger_image, wait_key)
 
-    print("image_shape :", image_shape)
-    print("overlap :", overlap)
-
+    cv2.imshow("image", image)
     cv2.imshow("generated_texture", generated_texture)
-    cv2.waitKey(0)
-    return True
-
-
-def demo_repeat():
-    image_file_path = "/home/chli/chLi/texture/Image/图片/11.jpg"
-
-    assert os.path.exists(image_file_path)
-    image = cv2.imread(image_file_path)
-
-    texture_generator = TextureGenerator()
-
-    repeat_texture = texture_generator.generateRepeatTexture(image)
-    cv2.imshow("repeat_texture", repeat_texture)
-
-    #  width_repeat_texture = texture_generator.generateRepeatTexture(
-    #  image, height_repeat=False)
-    #  cv2.imshow("width_repeat_texture", width_repeat_texture)
-
-    #  height_repeat_texture = texture_generator.generateRepeatTexture(
-    #  image, width_repeat=False)
-    #  cv2.imshow("height_repeat_texture", height_repeat_texture)
-
     cv2.waitKey(0)
     return True
 
