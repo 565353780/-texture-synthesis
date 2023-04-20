@@ -12,7 +12,7 @@ from texture_synthesis.Demo.texture_generator import \
     demo as demo_generate_repeat_texture, \
     demo_trans_folder_all as demo_trans_image_folder_to_all_texture
 from texture_synthesis.Demo.render import demo as demo_render_repeat_texture
-from texture_synthesis.Demo.image_cutter import demo as demo_cut_image()
+from texture_synthesis.Demo.image_cutter import demo as demo_cut_image
 
 if __name__ == "__main__":
     # demo coding for generating single texture for single image
