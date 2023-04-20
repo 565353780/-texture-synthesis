@@ -12,13 +12,17 @@ from texture_synthesis.Demo.texture_generator import \
     demo as demo_generate_repeat_texture, \
     demo_trans_folder_all as demo_trans_image_folder_to_all_texture
 from texture_synthesis.Demo.render import demo as demo_render_repeat_texture
+from texture_synthesis.Demo.image_cutter import demo as demo_cut_image()
 
 if __name__ == "__main__":
     # demo coding for generating single texture for single image
-    demo_generate_repeat_texture()
+    #  demo_generate_repeat_texture()
 
     # demo coding for translating images folder to repeat textures folder
-    demo_trans_image_folder_to_all_texture()
+    #  demo_trans_image_folder_to_all_texture()
 
     # demo coding for rendering the repeat texture
-    demo_render_repeat_texture()
+    #  demo_render_repeat_texture()
+
+    # demo coding for cutting image and further running with sd
+    demo_cut_image()
