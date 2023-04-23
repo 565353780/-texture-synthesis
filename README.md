@@ -1,5 +1,14 @@
 # Texture Synthesis
 
+## Download
+
+```bash
+https://huggingface.co/lllyasviel/ControlNet-v1-1/tree/main
+->./models/control_v11p_sd15_inpaint
+https://huggingface.co/runwayml/stable-diffusion-v1-5/tree/main
+->./models/v1-5-pruned.ckpt
+```
+
 ## Install
 
 ### install rust
