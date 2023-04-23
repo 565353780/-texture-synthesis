@@ -9,5 +9,5 @@ def demo():
 
     image_cutter = ImageCutter()
 
-    cut_image, mask = image_cutter.cutImageFile(image_file_path)
+    data = image_cutter.cutImageFile(image_file_path)
     return True

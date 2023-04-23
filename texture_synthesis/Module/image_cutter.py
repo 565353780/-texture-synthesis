@@ -7,17 +7,17 @@ import numpy as np
 from copy import deepcopy
 
 from texture_synthesis.Method.cut import getSubImageDict
-from texture_synthesis.Method.merge import mergeSubImagesWithMask
+from texture_synthesis.Method.merge import mergeSubImagesWithMask, recombineMergedImage
 
 
 def testEditMergedImage(data):
     merged_image = data['merged_image']
     mask = data['mask']
 
-    complete_image = deepcopy(merged_image)
-    complete_image[mask] = [0, 255, 0]
+    complete_merged_image = deepcopy(merged_image)
+    complete_merged_image[mask] = [0, 255, 0]
 
-    data['complete_image'] = complete_image
+    data['complete_merged_image'] = complete_merged_image
     return data
 
 
@@ -40,9 +40,12 @@ class ImageCutter(object):
 
         testEditMergedImage(data)
 
-        cv2.imshow('complete_image', data['complete_image'])
+        data = recombineMergedImage(data)
+
+        cv2.imshow('complete_merged_image', data['complete_merged_image'])
+        cv2.imshow('recombined_image', data['recombined_image'])
         cv2.waitKey(0)
-        return cut_image, mask
+        return data
 
     def cutImageFile(self, image_file_path):
         assert os.path.exists(image_file_path)

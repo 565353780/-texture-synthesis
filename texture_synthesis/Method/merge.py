@@ -50,3 +50,38 @@ def mergeSubImagesWithMask(data):
     data['merged_image'] = merged_image
     data['mask'] = mask
     return data
+
+
+def recombineMergedImage(data):
+    first_width = data['first_width']
+    first_height = data['first_height']
+    second_width = data['second_width']
+    second_height = data['second_height']
+    expand_half_width = data['expand_half_width']
+    expand_half_height = data['expand_half_height']
+    complete_merged_image = data['complete_merged_image']
+
+    expand_first_width = first_width + expand_half_width
+    expand_first_height = first_height + expand_half_height
+    expand_second_width = second_width + expand_half_width
+    expand_second_height = second_height + expand_half_height
+
+    recombined_image = np.zeros_like(complete_merged_image, dtype=np.uint8)
+
+    recombined_image[:expand_first_width, :
+                     expand_first_height] = complete_merged_image[
+                         expand_second_width:, expand_second_height:]
+    recombined_image[
+        expand_first_width:, :
+        expand_first_height] = complete_merged_image[:expand_second_width,
+                                                     expand_second_height:]
+    recombined_image[:expand_first_width,
+                     expand_first_height:] = complete_merged_image[
+                         expand_second_width:, :expand_second_height]
+    recombined_image[
+        expand_first_width:,
+        expand_first_height:] = complete_merged_image[:expand_second_width, :
+                                                      expand_second_height]
+
+    data['recombined_image'] = recombined_image
+    return data
