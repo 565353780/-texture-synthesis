@@ -4,9 +4,21 @@
 import os
 import cv2
 import numpy as np
+from copy import deepcopy
 
 from texture_synthesis.Method.cut import getSubImageDict
 from texture_synthesis.Method.merge import mergeSubImagesWithMask
+
+
+def testEditMergedImage(data):
+    merged_image = data['merged_image']
+    mask = data['mask']
+
+    complete_image = deepcopy(merged_image)
+    complete_image[mask] = [0, 255, 0]
+
+    data['complete_image'] = complete_image
+    return data
 
 
 class ImageCutter(object):
@@ -26,12 +38,9 @@ class ImageCutter(object):
 
         data = mergeSubImagesWithMask(data)
 
-        mask_image = np.zeros_like(data['merged_image'], dtype=np.uint8)
-        mask_image[data['mask']] = [255, 255, 255]
+        testEditMergedImage(data)
 
-        cv2.imshow('merged_image', data['merged_image'])
-        cv2.imshow('mask', mask_image)
-
+        cv2.imshow('complete_image', data['complete_image'])
         cv2.waitKey(0)
         return cut_image, mask
 
