@@ -26,9 +26,13 @@ def mergeSubImagesWithMask(data):
     merged_image_width = image_width + expand_half_width * 2
     merged_image_height = image_height + expand_half_height * 2
 
-    merged_image = np.zeros(
-        [merged_image_width, merged_image_height, image.shape[2]],
-        dtype=np.uint8)
+    if len(image.shape) == 3:
+        merged_image = np.zeros(
+            [merged_image_width, merged_image_height, image.shape[2]],
+            dtype=np.uint8)
+    else:
+        merged_image = np.zeros([merged_image_width, merged_image_height],
+                                dtype=np.uint8)
 
     merge_second_width_start = second_width + expand_half_width * 2
     merge_second_height_start = second_height + expand_half_height * 2
