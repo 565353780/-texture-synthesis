@@ -3,21 +3,10 @@
 
 import os
 import cv2
-from copy import deepcopy
 
 from texture_synthesis.Method.cut import getSubImageDict
 from texture_synthesis.Method.merge import mergeSubImagesWithMask, recombineMergedImage
-
-
-def testEditMergedImage(data):
-    merged_image = data['merged_image']
-    mask = data['mask']
-
-    complete_merged_image = deepcopy(merged_image)
-    complete_merged_image[mask] = [0, 255, 0]
-
-    data['complete_merged_image'] = complete_merged_image
-    return data
+from texture_synthesis.Method.fill import fillMergedImage
 
 
 class ImageCutter(object):
@@ -45,7 +34,7 @@ class ImageCutter(object):
                 '\t complete_merged_image not exist! will fill it as green color!'
             )
             print('\t you need to append it into the input dict!')
-            data = testEditMergedImage(data)
+            data = fillMergedImage(data)
 
         data = recombineMergedImage(data)
         return data
