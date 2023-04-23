@@ -40,7 +40,7 @@ def getSubImageDict(data):
     left_up = deepcopy(image[:first_width, :first_height])
     right_up = deepcopy(image[first_width:, :first_height])
     left_down = deepcopy(image[:first_width, first_height:])
-    right_down = deepcopy(image[:first_width, :first_height])
+    right_down = deepcopy(image[first_width:, first_height:])
 
     data['first_width'] = first_width
     data['first_height'] = first_height
