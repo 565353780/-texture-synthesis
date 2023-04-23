@@ -24,13 +24,11 @@ class SDServer(object):
         self.model_name = 'control_v11p_sd15_inpaint'
         self.model = create_model(
             f'../ControlNet-v1-1-nightly/models/{self.model_name}.yaml').cpu()
-        self.model.load_state_dict(load_state_dict(
-            '../ControlNet-v1-1-nightly/models/v1-5-pruned.ckpt',
-            location='cuda'),
+        self.model.load_state_dict(load_state_dict('./models/v1-5-pruned.ckpt',
+                                                   location='cuda'),
                                    strict=False)
         self.model.load_state_dict(load_state_dict(
-            f'../ControlNet-v1-1-nightly/models/{self.model_name}.pth',
-            location='cuda'),
+            f'./models/{self.model_name}.pth', location='cuda'),
                                    strict=False)
         self.model = self.model.cuda()
         self.ddim_sampler = DDIMSampler(self.model)
