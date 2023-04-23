@@ -39,5 +39,11 @@ conda activate texture
 python demo.py
 ```
 
+## Run Control Stable Diffusion Server
+
+```bash
+python run_server.py
+```
+
 ## Enjoy it~
 
