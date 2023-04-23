@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 
 from texture_synthesis.Method.cut import getSubImageDict
+from texture_synthesis.Method.merge import mergeSubImagesWithMask
 
 
 class ImageCutter(object):
@@ -15,29 +16,21 @@ class ImageCutter(object):
         return
 
     def cutImage(self, image):
-        sub_image_dict = getSubImageDict(image)
+        data = {
+            'image': image,
+            'width_expand': self.width_expand,
+            'height_expand': self.height_expand
+        }
 
-        first_width = sub_image_dict['first_width']
-        first_height = sub_image_dict['first_height']
-        second_width = sub_image_dict['second_width']
-        second_height = sub_image_dict['second_height']
+        data = getSubImageDict(data)
 
-        left_up = np.zeros_like(image, dtype=np.uint8)
-        left_up[:first_width, :first_height] = sub_image_dict['left_up']
+        data = mergeSubImagesWithMask(data)
 
-        right_up = np.zeros_like(image, dtype=np.uint8)
-        right_up[first_width:, :first_height] = sub_image_dict['right_up']
+        mask_image = np.zeros_like(data['merged_image'], dtype=np.uint8)
+        mask_image[data['mask']] = [255, 255, 255]
 
-        left_down = np.zeros_like(image, dtype=np.uint8)
-        left_down[:first_width, first_height:] = sub_image_dict['left_down']
-
-        right_down = np.zeros_like(image, dtype=np.uint8)
-        right_down[first_width:, first_height:] = sub_image_dict['right_down']
-
-        cv2.imshow('left_up', left_up)
-        cv2.imshow('right_up', right_up)
-        cv2.imshow('left_down', left_down)
-        cv2.imshow('right_down', right_down)
+        cv2.imshow('merged_image', data['merged_image'])
+        cv2.imshow('mask', mask_image)
 
         cv2.waitKey(0)
         return cut_image, mask
