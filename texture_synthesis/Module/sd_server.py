@@ -22,12 +22,15 @@ from texture_synthesis.Module.image_cutter import ImageCutter
 class SDServer(object):
     def __init__(self):
         self.model_name = 'control_v11p_sd15_inpaint'
-        self.model = create_model(f'./models/{self.model_name}.yaml').cpu()
-        self.model.load_state_dict(load_state_dict('./models/v1-5-pruned.ckpt',
-                                                   location='cuda'),
+        self.model = create_model(
+            f'../ControlNet-v1-1-nightly/models/{self.model_name}.yaml').cpu()
+        self.model.load_state_dict(load_state_dict(
+            '../ControlNet-v1-1-nightly/models/v1-5-pruned.ckpt',
+            location='cuda'),
                                    strict=False)
         self.model.load_state_dict(load_state_dict(
-            f'./models/{self.model_name}.pth', location='cuda'),
+            f'../ControlNet-v1-1-nightly/models/{self.model_name}.pth',
+            location='cuda'),
                                    strict=False)
         self.model = self.model.cuda()
         self.ddim_sampler = DDIMSampler(self.model)
@@ -48,7 +51,19 @@ class SDServer(object):
         merged_mask = deepcopy(mask_data['merged_image'])
         image_mask = deepcopy(image_data['mask']).astype(np.uint8) * 255
         merged_mask[np.where(image_mask == 255)] = 255
-        return merged_image, merged_mask
+        return merged_image, merged_mask, image_data
+
+    def getRecombinedImage(self, image_data, image):
+        merged_image_width, merged_image_height = image_data[
+            'merged_image'].shape[:2]
+
+        image_data['complete_merged_image'] = cv2.resize(
+            deepcopy(image), (merged_image_height, merged_image_width))
+
+        image_data = self.image_cutter.recombineImage(image_data)
+
+        recombined_image = deepcopy(image_data['recombined_image'])
+        return recombined_image
 
     def process(self, input_image_and_mask, prompt, a_prompt, n_prompt,
                 num_samples, width_expand, height_expand, image_resolution,
@@ -58,7 +73,7 @@ class SDServer(object):
             input_image = HWC3(input_image_and_mask['image'])
             input_mask = input_image_and_mask['mask']
 
-            merged_image, merged_mask = self.getMergedImageAndMask(
+            merged_image, merged_mask, image_data = self.getMergedImageAndMask(
                 input_image, input_mask, width_expand, height_expand)
 
             img = resize_image(merged_image, image_resolution)
@@ -125,8 +140,23 @@ class SDServer(object):
                 einops.rearrange(x_samples, 'b c h w -> b h w c') * 127.5 +
                 127.5).cpu().numpy().clip(0, 255).astype(np.uint8)
 
+            image_width, image_height = image_data['image'].shape[:2]
+
+            masked_image = detected_map.clip(0, 255).astype(np.uint8)
             results = [x_samples[i] for i in range(num_samples)]
-        return [detected_map.clip(0, 255).astype(np.uint8)] + results
+
+            new_masked_image = self.getRecombinedImage(image_data,
+                                                       masked_image)
+
+            return_image_list = [
+                cv2.resize(new_masked_image, (image_height, image_width))
+            ]
+            for result in results:
+                new_result = self.getRecombinedImage(image_data, result)
+                return_image_list.append(
+                    cv2.resize(new_result, (image_height, image_width)))
+
+        return return_image_list
 
     def start(self):
 
