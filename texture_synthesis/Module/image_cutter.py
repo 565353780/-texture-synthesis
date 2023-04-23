@@ -3,7 +3,6 @@
 
 import os
 import cv2
-import numpy as np
 from copy import deepcopy
 
 from texture_synthesis.Method.cut import getSubImageDict
@@ -37,14 +36,18 @@ class ImageCutter(object):
         data = getSubImageDict(data)
 
         data = mergeSubImagesWithMask(data)
+        return data
 
-        testEditMergedImage(data)
+    def recombineImage(self, data):
+        if 'complete_merged_image' not in data.keys():
+            print('[WARN][ImageCutter::recombineImage]')
+            print(
+                '\t complete_merged_image not exist! will fill it as green color!'
+            )
+            print('\t you need to append it into the input dict!')
+            data = testEditMergedImage(data)
 
         data = recombineMergedImage(data)
-
-        cv2.imshow('complete_merged_image', data['complete_merged_image'])
-        cv2.imshow('recombined_image', data['recombined_image'])
-        cv2.waitKey(0)
         return data
 
     def cutImageFile(self, image_file_path):
