@@ -13,6 +13,7 @@ from texture_synthesis.Demo.texture_generator import \
     demo_trans_folder_all as demo_trans_image_folder_to_all_texture
 from texture_synthesis.Demo.render import demo as demo_render_repeat_texture
 from texture_synthesis.Demo.image_cutter import demo as demo_cut_image
+from texture_synthesis.Demo.sd_server import demo as demo_sd_server
 
 if __name__ == "__main__":
     # demo coding for generating single texture for single image
@@ -26,3 +27,6 @@ if __name__ == "__main__":
 
     # demo coding for cutting image and further running with sd
     demo_cut_image()
+
+    # demo running stable diffusion server
+    #  demo_sd_server()
